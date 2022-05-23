@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;
 using SharpDX;
 
@@ -7,19 +8,19 @@ namespace Radar;
 
 public static class Extensions
 {
-    public static SharpDX.Vector2 ToSdx(this System.Numerics.Vector2 v)
+    public static Vector3 GridPos(this Render render)
     {
-        return new SharpDX.Vector2(v.X, v.Y);
+        return render.Pos / Radar.GridToWorldMultiplier;
     }
 
-    public static Vector2i Truncate(this SharpDX.Vector2 v)
-    {
-        return new Vector2i((int)v.X, (int)v.Y);
-    }
-
-    public static SharpDX.Vector2 XY(this SharpDX.Vector3 v)
+    public static Vector2 ToSdx(this System.Numerics.Vector2 v)
     {
         return new Vector2(v.X, v.Y);
+    }
+
+    public static Vector2i Truncate(this Vector2 v)
+    {
+        return new Vector2i((int)v.X, (int)v.Y);
     }
 
     public static IEnumerable<T> GetEveryNth<T>(this IEnumerable<T> source, int n)

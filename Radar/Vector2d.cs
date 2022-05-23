@@ -4,6 +4,9 @@ namespace Radar;
 
 public readonly record struct Vector2d(double X, double Y)
 {
+    public readonly double X = X;
+    public readonly double Y = Y;
+
     public double Length => Math.Sqrt(X * X + Y * Y);
 
     public static Vector2d operator -(Vector2d v1, Vector2d v2)
