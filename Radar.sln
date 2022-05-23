@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radar", "Radar\Radar.csproj", "{58C24999-EA8B-47FC-B789-9CE9926AD701}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radar", "Radar.csproj", "{58C24999-EA8B-47FC-B789-9CE9926AD701}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
