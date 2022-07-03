@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -51,18 +50,14 @@ public class PathFinder
         new Vector2i(-1, 1),
     };
 
-    private IEnumerable<Vector2i> GetNeighbors(Vector2i tile)
+    private static IEnumerable<Vector2i> GetNeighbors(Vector2i tile)
     {
-        foreach (var offset in NeighborOffsets)
-        {
-            var nTile = tile + offset;
-            yield return nTile;
-        }
+        return NeighborOffsets.Select(offset => tile + offset);
     }
 
-    private float GetExactDistance(Vector2i tile, Dictionary<Vector2i, float> dict)
+    private static float GetExactDistance(Vector2i tile, Dictionary<Vector2i, float> dict)
     {
-        return dict.GetValueOrDefault(tile, Single.PositiveInfinity);
+        return dict.GetValueOrDefault(tile, float.PositiveInfinity);
     }
 
     public IEnumerable<List<Vector2i>> RunFirstScan(Vector2i start, Vector2i target)
@@ -95,16 +90,14 @@ public class PathFinder
         var sw = Stopwatch.StartNew();
 
         localBacktrackDictionary.Add(target, target);
+        var reversePath = new List<Vector2i>();
         while (queue.TryRemoveTop(out var top))
         {
             var current = top.Value;
             var currentDistance = top.Key;
-            if (current.Equals(start))
+            if (reversePath.Count == 0 && current.Equals(start))
             {
-                var reversePath = new List<Vector2i>
-                {
-                    current
-                };
+                reversePath.Add(current);
                 var it = current;
                 while (it != target && localBacktrackDictionary.TryGetValue(it, out var previous))
                 {
@@ -122,7 +115,7 @@ public class PathFinder
 
             if (sw.ElapsedMilliseconds > 100)
             {
-                yield return new List<Vector2i>();
+                yield return reversePath;
                 sw.Restart();
             }
         }
@@ -131,21 +124,17 @@ public class PathFinder
     public List<Vector2i> FindPath(Vector2i start, Vector2i target)
     {
         var exactDistanceField = ExactDistanceField[target];
-        if (GetExactDistance(start, exactDistanceField) != float.PositiveInfinity)
+        if (float.IsPositiveInfinity(GetExactDistance(start, exactDistanceField))) return null;
+        var path = new List<Vector2i>();
+        var current = start;
+        while (current != target)
         {
-            var path = new List<Vector2i>();
-            var current = start;
-            while (current != target)
-            {
-                var next = GetNeighbors(current).OrderBy(x => GetExactDistance(x, exactDistanceField)).First();
-                Debug.Assert(!path.Contains(next));
-                path.Add(next);
-                current = next;
-            }
-
-            return path;
+            var next = GetNeighbors(current).MinBy(x => GetExactDistance(x, exactDistanceField));
+            Debug.Assert(!path.Contains(next));
+            path.Add(next);
+            current = next;
         }
 
-        return null;
+        return path;
     }
 }

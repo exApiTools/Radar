@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using ExileCore;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.MemoryObjects;
@@ -13,667 +10,320 @@ using ExileCore.Shared;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
-using Newtonsoft.Json;
+using ImGuiNET;
 using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Processors.Convolution;
 using Color = SharpDX.Color;
-using Configuration = SixLabors.ImageSharp.Configuration;
 using Positioned = ExileCore.PoEMemory.Components.Positioned;
 using RectangleF = SixLabors.ImageSharp.RectangleF;
-using Vector4 = System.Numerics.Vector4;
 
-namespace Radar
+namespace Radar;
+
+public partial class Radar : BaseSettingsPlugin<RadarSettings>
 {
-    public class Radar : BaseSettingsPlugin<RadarSettings>
+    private const string TextureName = "radar_minimap";
+    private const int TileToGridConversion = 23;
+    private const int TileToWorldConversion = 250;
+    public const float GridToWorldMultiplier = TileToWorldConversion / (float)TileToGridConversion;
+    private const double TileHeightFinalMultiplier = 125 / 16.0; //this translates the height in the tile metadata to
+    private const double CameraAngle = 38.7 * Math.PI / 180;
+    private static readonly float CameraAngleCos = (float)Math.Cos(CameraAngle);
+    private static readonly float CameraAngleSin = (float)Math.Sin(CameraAngle);
+    private double _mapScale;
+
+    private ConcurrentDictionary<string, List<TargetDescription>> _targetDescriptions = new();
+    private Vector2i? _areaDimensions;
+    private TerrainData _terrainMetadata;
+    private float[][] _heightData;
+    private byte[] _rawTerrainData;
+    private int[][] _processedTerrainData;
+    private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
+    private HashSet<string> _currentZoneTargetEntityPaths = new();
+    private CancellationTokenSource _findPathsCts = new CancellationTokenSource();
+    private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
+    private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
+    private ConcurrentDictionary<Vector2, RouteDescription> _routes = new();
+    private byte[] _rotationSelectorCache;
+    private byte[] RotationSelector => _rotationSelectorCache ??= GetRotationSelector();
+    private byte[] _rotationHelperCache;
+    private byte[] RotationHelper => _rotationHelperCache ??= GetRotationHelper();
+
+    public override void AreaChange(AreaInstance area)
     {
-        private const string TextureName = "radar_minimap";
-        private const int TileToGridConversion = 23;
-        private const int TileToWorldConversion = 250;
-        public const float GridToWorldMultiplier = TileToWorldConversion / (float)TileToGridConversion;
-        private const double TileHeightFinalMultiplier = 125 / 16.0; //this translates the height in the tile metadata to
-        private const double CameraAngle = 38.7 * Math.PI / 180;
-        private static readonly float CameraAngleCos = (float)Math.Cos(CameraAngle);
-        private static readonly float CameraAngleSin = (float)Math.Sin(CameraAngle);
-        private double _mapScale;
-
-        private ConcurrentDictionary<string, List<TargetDescription>> _targetDescriptions = new();
-        private Vector2i? _areaDimensions;
-        private TerrainData _terrainMetadata;
-        private float[][] _heightData;
-        private byte[] _rawTerrainData;
-        private int[][] _processedTerrainData;
-        private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
-        private HashSet<string> _currentZoneTargetEntityPaths = new();
-        private CancellationTokenSource _findPathsCts = new CancellationTokenSource();
-        private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
-        private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
-        private ConcurrentDictionary<string, RouteDescription> _routes = new();
-        private byte[] _rotationSelectorCache;
-        private byte[] RotationSelector => _rotationSelectorCache ??= GetRotationSelector();
-        private byte[] _rotationHelperCache;
-        private byte[] RotationHelper => _rotationHelperCache ??= GetRotationHelper();
-
-        private byte[] GetRotationSelector()
+        StopPathFinding();
+        if (GameController.Game.IsInGameState || GameController.Game.IsEscapeState)
         {
-            var pattern = new Pattern(
-                "^ ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 4c ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 4c ?? ?? 8b ?? 2b ?? 33 ??",
-                "Terrain Rotation Selector");
-            var address = GameController.Memory.FindPatterns(pattern)[0];
-
-            var realAddress = GameController.Memory.Read<int>(GameController.Memory.AddressOfProcess + address + pattern.PatternOffset) + address + pattern.PatternOffset + 4;
-            return GameController.Memory.ReadBytes(GameController.Memory.AddressOfProcess + realAddress, 8);
-        }
-
-        private byte[] GetRotationHelper()
-        {
-            var pattern = new Pattern("4c ?? ?? ?? 48 ?? ?? ^ ?? ?? ?? ?? 4c ?? ?? 8b ?? 2b ?? 33 ??", "Terrain Rotator Helper");
-            var address = GameController.Memory.FindPatterns(pattern)[0];
-
-            var realAddress = GameController.Memory.Read<int>(GameController.Memory.AddressOfProcess + address + pattern.PatternOffset) + address + pattern.PatternOffset + 4;
-            return GameController.Memory.ReadBytes(GameController.Memory.AddressOfProcess + realAddress, 24);
-        }
-
-        public override void AreaChange(AreaInstance area)
-        {
-            StopPathFinding();
-            if (GameController.Game.IsInGameState || GameController.Game.IsEscapeState)
-            {
-                _targetDescriptionsInArea = GetTargetDescriptionsInArea().ToDictionary(x => x.Name);
-                _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).Select(x => x.Name).ToHashSet();
-                _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
-                _rawTerrainData = GameController.Memory.ReadStdVector<byte>(Cast(_terrainMetadata.LayerMelee));
-                _heightData = GetTerrainHeight();
-                _allTargetLocations = GetTargets();
-                _processedTerrainData = GenerateMapTextureAndTerrainData();
-                _clusteredTargetLocations = ClusterTargets();
-                StartPathFinding();
-            }
-        }
-
-        private static StdVector Cast(NativePtrArray nativePtrArray)
-        {
-            //PepeLa
-            //this is going to break one day and everyone's gonna be sorry, but I'm leaving this
-            return MemoryMarshal.Cast<NativePtrArray, StdVector>(stackalloc NativePtrArray[] { nativePtrArray })[0];
-        }
-
-        private void LoadTargets()
-        {
-            var fileText = File.ReadAllText(Path.Combine(DirectoryFullName, "targets.json"));
-            _targetDescriptions = JsonConvert.DeserializeObject<ConcurrentDictionary<string, List<TargetDescription>>>(fileText);
-        }
-
-        private void RestartPathFinding()
-        {
-            StopPathFinding();
+            _targetDescriptionsInArea = GetTargetDescriptionsInArea().ToDictionary(x => x.Name);
+            _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).Select(x => x.Name).ToHashSet();
+            _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
+            _rawTerrainData = GameController.Memory.ReadStdVector<byte>(Cast(_terrainMetadata.LayerMelee));
+            _heightData = GetTerrainHeight();
+            _allTargetLocations = GetTargets();
+            _processedTerrainData = ParseTerrainPathData();
+            GenerateMapTexture();
+            _clusteredTargetLocations = ClusterTargets();
             StartPathFinding();
         }
+    }
 
-        private void StartPathFinding()
+    private static readonly List<Color> RainbowColors = new List<Color>
+    {
+        Color.Red,
+        Color.Green,
+        Color.Blue,
+        Color.Yellow,
+        Color.Violet,
+        Color.Orange,
+        Color.White,
+        Color.LightBlue,
+        Color.Indigo,
+    };
+
+    private SharpDX.RectangleF _rect;
+    private ImDrawListPtr _backGroundWindowPtr;
+
+    public override void OnLoad()
+    {
+        LoadTargets();
+        Settings.Reload.OnPressed = () =>
         {
-            if (Settings.ShowPathsToTargets)
+            Core.MainRunner.Run(new Coroutine(() =>
             {
-                FindPaths(_clusteredTargetLocations, _routes, _findPathsCts.Token);
-            }
-        }
+                LoadTargets();
+                AreaChange(GameController.Area.CurrentArea);
+            }, new WaitTime(0), this, "RestartPathfinding", false, true));
+        };
+        Settings.MaximumPathCount.OnValueChanged += (_, _) => { Core.MainRunner.Run(new Coroutine(RestartPathFinding, new WaitTime(0), this, "RestartPathfinding", false, true)); };
+        Settings.TerrainColor.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.DrawHeightMap.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.SkipEdgeDetector.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.SkipNeighborFill.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.SkipRecoloring.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.DisableHeightAdjust.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+    }
 
-        private void StopPathFinding()
+    public override void EntityAdded(Entity entity)
+    {
+        var positioned = entity.GetComponent<Positioned>();
+        if (positioned != null)
         {
-            _findPathsCts.Cancel();
-            _findPathsCts = new CancellationTokenSource();
-            _routes = new ConcurrentDictionary<string, RouteDescription>();
-        }
-
-        private void FindPaths(IReadOnlyDictionary<string, TargetLocations> tiles, ConcurrentDictionary<string, RouteDescription> routes, CancellationToken cancellationToken)
-        {
-            var numbers = tiles.SelectMany(x => x.Value.Locations.Select((y, i) => (x.Key, i, y)))
-               .ToDictionary(x => $"{x.Key}_{x.i}", x => x.y);
-            var pf = new PathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
-            foreach (var (name, point) in numbers.OrderBy(x => x.Key).Take(Settings.MaximumPathCount))
+            var path = entity.Path;
+            if (_currentZoneTargetEntityPaths.Contains(path))
             {
-                Task.Run(() => FindPath(pf, name, point, routes, cancellationToken));
-            }
-        }
-
-        private async Task WaitUntilPluginEnabled(CancellationToken cancellationToken)
-        {
-            while (!Settings.Enable)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            }
-        }
-
-        private async Task FindPath(PathFinder pf, string name, Vector2 point,
-                                    ConcurrentDictionary<string, RouteDescription> routes, CancellationToken cancellationToken)
-        {
-            var playerPosition = GetPlayerPosition();
-            var pathI = pf.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
-            foreach (var elem in pathI)
-            {
-                await WaitUntilPluginEnabled(cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
+                bool alreadyContains = false;
+                _allTargetLocations.AddOrUpdate(path, _ => new List<Vector2i> { positioned.GridPos.Truncate() },
+                    // ReSharper disable once AssignmentInConditionalExpression
+                    (_, l) => (alreadyContains = l.Contains(positioned.GridPos.Truncate())) ? l : l.Append(positioned.GridPos.Truncate()).ToList());
+                if (!alreadyContains)
                 {
-                    return;
-                }
-
-                if (elem.Any())
-                {
-                    var rd = new RouteDescription { Path = elem, Color = Settings.DefaultPathColor };
-                    _routes.AddOrUpdate(name, rd, (_, _) => rd);
-                }
-            }
-
-            while (true)
-            {
-                await WaitUntilPluginEnabled(cancellationToken);
-                var newPosition = GetPlayerPosition();
-                if (playerPosition == newPosition)
-                {
-                    await Task.Delay(100, cancellationToken);
-                    continue;
-                }
-
-                playerPosition = newPosition;
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                var path = pf.FindPath(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
-                if (path != null)
-                {
-                    var rd = new RouteDescription { Path = path, Color = Settings.DefaultPathColor };
-                    routes.AddOrUpdate(name, rd, (_, _) => rd);
-                }
-            }
-        }
-
-
-        public override void OnLoad()
-        {
-            LoadTargets();
-            Settings.Reload.OnPressed = () =>
-            {
-                Core.MainRunner.Run(new Coroutine(() =>
-                {
-                    LoadTargets();
-                    AreaChange(GameController.Area.CurrentArea);
-                }, new WaitTime(0), this, "RestartPathfinding", false, true));
-            };
-            Settings.MaximumPathCount.OnValueChanged += (_, _) =>
-            {
-                Core.MainRunner.Run(new Coroutine(RestartPathFinding, new WaitTime(0), this, "RestartPathfinding", false, true));
-            };
-        }
-
-        public override void EntityAdded(Entity entity)
-        {
-            var positioned = entity.GetComponent<Positioned>();
-            if (positioned != null)
-            {
-                var path = entity.Path;
-                if (_currentZoneTargetEntityPaths.Contains(path))
-                {
-                    bool alreadyContains = false;
-                    _allTargetLocations.AddOrUpdate(path, _ => new List<Vector2i> { positioned.GridPos.Truncate() },
-                        // ReSharper disable once AssignmentInConditionalExpression
-                        (_, l) => (alreadyContains = l.Contains(positioned.GridPos.Truncate())) ? l : l.Append(positioned.GridPos.Truncate()).ToList());
-                    if (!alreadyContains)
+                    var oldValue = _clusteredTargetLocations.GetValueOrDefault(path);
+                    var newValue = _clusteredTargetLocations.AddOrUpdate(path,
+                        _ => ClusterTarget(_targetDescriptionsInArea[path]),
+                        (_, _) => ClusterTarget(_targetDescriptionsInArea[path]));
+                    //restarting PF is a VERY expensive option, so spare some cycles to check we actually need it
+                    if (oldValue == null || !newValue.Locations.ToHashSet().SetEquals(oldValue.Locations))
                     {
-                        var oldValue = _clusteredTargetLocations.GetValueOrDefault(path);
-                        var newValue = _clusteredTargetLocations.AddOrUpdate(path,
-                            _ => ClusterTarget(_targetDescriptionsInArea[path]),
-                            (_, _) => ClusterTarget(_targetDescriptionsInArea[path]));
-                        //restarting PF is a VERY expensive option, so spare some cycles to check we actually need it
-                        if (oldValue == null || !newValue.Locations.ToHashSet().SetEquals(oldValue.Locations))
-                        {
-                            RestartPathFinding();
-                        }
+                        RestartPathFinding();
                     }
                 }
             }
         }
+    }
 
-        private float[][] GetTerrainHeight()
+    private Vector2 GetPlayerPosition()
+    {
+        var player = GameController.Game.IngameState.Data.LocalPlayer;
+        var playerPositionComponent = player.GetComponent<Positioned>();
+        if (playerPositionComponent == null)
+            return new Vector2(0, 0);
+        var playerPosition = new Vector2(playerPositionComponent.GridX, playerPositionComponent.GridY);
+        return playerPosition;
+    }
+
+    public override void Render()
+    {
+        var ingameUi = GameController.Game.IngameState.IngameUi;
+        if (!Settings.Debug.IgnoreFullscreenPanels &&
+            (ingameUi.DelveWindow.IsVisible ||
+             ingameUi.Atlas.IsVisible ||
+             ingameUi.SellWindow.IsVisible))
         {
-            var rotationSelector = RotationSelector;
-            var rotationHelper = RotationHelper;
-            var tileData = GameController.Memory.ReadStdVector<TileStructure>(Cast(_terrainMetadata.TgtArray));
-            var tileHeightCache = tileData.Select(x => x.SubTileDetailsPtr)
-               .Distinct()
-               .AsParallel()
-               .Select(addr => new
-                {
-                    addr,
-                    data = GameController.Memory.ReadStdVector<sbyte>(GameController.Memory.Read<SubTileStructure>(addr).SubTileHeight)
-                })
-               .ToDictionary(x => x.addr, x => x.data);
-            var gridSizeX = _terrainMetadata.NumCols * TileToGridConversion;
-            var toExclusive = _terrainMetadata.NumRows * TileToGridConversion;
-            var result = new float[toExclusive][];
-            Parallel.For(0, toExclusive, y =>
+            return;
+        }
+
+        _rect = GameController.Window.GetWindowRectangle() with { Location = Vector2.Zero };
+        if (!Settings.Debug.DisableDrawRegionLimiting)
+        {
+            if (ingameUi.OpenRightPanel.IsVisible)
             {
-                result[y] = new float[gridSizeX];
-                for (var x = 0; x < gridSizeX; ++x)
-                {
-                    var tileStructure = tileData[y / TileToGridConversion * _terrainMetadata.NumCols + x / TileToGridConversion];
-                    var tileHeightArray = tileHeightCache[tileStructure.SubTileDetailsPtr];
-                    var num1 = 0;
-                    if (tileHeightArray.Length != 0)
-                    {
-                        var gridX = x % TileToGridConversion;
-                        var gridY = y % TileToGridConversion;
-                        var maxCoordInTile = TileToGridConversion - 1;
-                        int[] coordHelperArray =
-                        {
-                            maxCoordInTile - gridX,
-                            gridX,
-                            maxCoordInTile - gridY,
-                            gridY
-                        };
-                        var rotationIndex = rotationSelector[tileStructure.RotationSelector] * 3;
-                        int axisSwitch = rotationHelper[rotationIndex];
-                        int smallAxisFlip = rotationHelper[rotationIndex + 1];
-                        int largeAxisFlip = rotationHelper[rotationIndex + 2];
-                        var smallIndex = coordHelperArray[axisSwitch * 2 + smallAxisFlip];
-                        var index = coordHelperArray[largeAxisFlip + (1 - axisSwitch) * 2] * TileToGridConversion + smallIndex;
-                        num1 = tileHeightArray[index];
-                    }
-
-                    result[y][x] = (float)((tileStructure.TileHeight * (int)_terrainMetadata.TileHeightMultiplier + num1) * TileHeightFinalMultiplier);
-                }
-            });
-            return result;
-        }
-
-        private ConcurrentDictionary<string, List<Vector2i>> GetTargets()
-        {
-            return new ConcurrentDictionary<string, List<Vector2i>>(GetTileTargets().Concat(GetEntityTargets())
-               .ToLookup(x => x.Key, x => x.Value)
-               .ToDictionary(x => x.Key, x => x.SelectMany(v => v).ToList()));
-        }
-
-        private Dictionary<string, List<Vector2i>> GetEntityTargets()
-        {
-            return GameController.Entities.Where(x => x.HasComponent<Positioned>()).Where(x => _currentZoneTargetEntityPaths.Contains(x.Path))
-               .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPos.Truncate())
-               .ToDictionary(x => x.Key, x => x.ToList());
-        }
-
-        private Dictionary<string, List<Vector2i>> GetTileTargets()
-        {
-            var tileData = GameController.Memory.ReadStdVector<TileStructure>(Cast(_terrainMetadata.TgtArray));
-            var ret = new ConcurrentDictionary<string, ConcurrentQueue<Vector2i>>();
-            Parallel.For(0, tileData.Length, tileNumber =>
-            {
-                var key = GameController.Memory.Read<TgtDetailStruct>
-                (GameController.Memory.Read<TgtTileStruct>(tileData[tileNumber].TgtFilePtr)
-                   .TgtDetailPtr).name.ToString(GameController.Memory);
-                if (string.IsNullOrEmpty(key))
-                    return;
-                var stdTuple2D = new Vector2i(
-                    (int)(tileNumber % _terrainMetadata.NumCols) * TileToGridConversion,
-                    (int)(tileNumber / _terrainMetadata.NumCols) * TileToGridConversion);
-
-                ret.GetOrAdd(key, _ => new ConcurrentQueue<Vector2i>()).Enqueue(stdTuple2D);
-            });
-            return ret.ToDictionary(k => k.Key, k => k.Value.ToList());
-        }
-
-        private unsafe int[][] GenerateMapTextureAndTerrainData()
-        {
-            var gridHeightData = _heightData;
-            var mapTextureData = _rawTerrainData;
-            var bytesPerRow = _terrainMetadata.BytesPerRow;
-            var totalRows = mapTextureData.Length / bytesPerRow;
-            var processedTerrainData = new int[totalRows][];
-            var xSize = bytesPerRow * 2;
-            for (var i = 0; i < totalRows; i++)
-            {
-                processedTerrainData[i] = new int[xSize];
+                _rect.Right = ingameUi.OpenRightPanel.GetClientRectCache.Left;
             }
 
-            using var image = new Image<Rgba32>(xSize, totalRows);
-            if (Settings.DrawHeightMap)
+            if (ingameUi.OpenLeftPanel.IsVisible)
             {
-                var minHeight = gridHeightData.Min(x => x.Min());
-                var maxHeight = gridHeightData.Max(x => x.Max());
-                image.Mutate(c => c.ProcessPixelRowsAsVector4((row, i) =>
-                {
-                    for (var x = 0; x < row.Length - 1; x += 2)
-                    {
-                        var cellData = gridHeightData[i.Y][x];
-                        var rawTerrainType = mapTextureData[i.Y * bytesPerRow + x / 2];
-                        for (var x_s = 0; x_s < 2; ++x_s)
-                        {
-                            var rawPathType = rawTerrainType >> 4 * x_s & 15;
-                            processedTerrainData[i.Y][x + x_s] = rawPathType;
-                            row[x + x_s] = new Vector4(0, (cellData - minHeight) / (maxHeight - minHeight), 0, 1);
-                        }
-                    }
-                }));
+                _rect.Left = ingameUi.OpenLeftPanel.GetClientRectCache.Right;
             }
-            else
-            {
-                var unwalkableMask = Vector4.One;
-                var walkableMask = Vector4.UnitY;
-                Parallel.For(0, totalRows, y =>
-                {
-                    for (var x = 0; x < xSize; x += 2)
-                    {
-                        var cellData = gridHeightData[y][x];
-
-                        //basically, offset x and y by half the offset z would cause when rendering in 3d
-                        var heightOffset = (int)(cellData / GridToWorldMultiplier / 2);
-                        var offsetX = x + heightOffset;
-                        var offsetY = y + heightOffset;
-                        var rawTerrainType = mapTextureData[y * bytesPerRow + x / 2];
-                        for (var xs = 0; xs < 2; xs++)
-                        {
-                            var rawPathType = rawTerrainType >> 4 * xs & 15;
-                            processedTerrainData[y][x + xs] = rawPathType;
-                            var offsetXa = offsetX + xs;
-                            if (offsetXa >= 0 && offsetXa < xSize && offsetY >= 0 && offsetY < totalRows)
-                            {
-                                image[offsetXa, offsetY] = new Rgba32(rawPathType is 0 ? unwalkableMask : walkableMask);
-                            }
-                        }
-                    }
-                });
-                Parallel.For(1, totalRows - 1, y =>
-                {
-                    for (var x = 1; x < xSize - 1; x++)
-                    {
-                        //this fills in the blanks that are left over from the height projection
-                        if (image[x, y].ToVector4() == Vector4.Zero)
-                        {
-                            var countWalkable = 0;
-                            var countUnwalkable = 0;
-                            for (var xO = -1; xO < 2; xO++)
-                            {
-                                for (var yO = -1; yO < 2; yO++)
-                                {
-                                    var nPixel = image[x + xO, y + yO].ToVector4();
-                                    if (nPixel == walkableMask)
-                                        countWalkable++;
-                                    else if (nPixel == unwalkableMask)
-                                        countUnwalkable++;
-                                }
-                            }
-
-                            image[x, y] = new Rgba32(countWalkable > countUnwalkable ? walkableMask : unwalkableMask);
-                        }
-                    }
-                });
-
-                var edgeDetector = new EdgeDetectorProcessor(new EdgeDetectorKernel(new DenseMatrix<float>(new float[,]
-                    {
-                        { -1, -1, -1, -1, -1 },
-                        { -1, -1, -1, -1, -1 },
-                        { -1, -1, 24, -1, -1 },
-                        { -1, -1, -1, -1, -1 },
-                        { -1, -1, -1, -1, -1 },
-                    })), false)
-                   .CreatePixelSpecificProcessor(Configuration.Default, image, image.Bounds());
-                edgeDetector.Execute();
-                image.Mutate(c => c.ProcessPixelRowsAsVector4(row =>
-                {
-                    for (var i = 0; i < row.Length; i++)
-                    {
-                        row[i] = row[i] switch
-                        {
-                            { X: 1 } => new Vector4(150f) / byte.MaxValue,
-                            { X: 0 } => Vector4.Zero,
-                            var s => s
-                        };
-                    }
-                }));
-            }
-
-            image.TryGetSinglePixelSpan(out var span);
-            var width = image.Width;
-            var height = image.Height;
-            var bytesPerPixel = image.PixelType.BitsPerPixel / 8;
-            fixed (Rgba32* rgba32Ptr = &MemoryMarshal.GetReference<Rgba32>(span))
-            {
-                var rect = new DataRectangle(new IntPtr(rgba32Ptr), width * bytesPerPixel);
-
-                using var tex2D = new Texture2D(Graphics.LowLevel.D11Device,
-                    new Texture2DDescription
-                    {
-                        Width = width,
-                        Height = height,
-                        MipLevels = 1,
-                        ArraySize = 1,
-                        Format = Format.R8G8B8A8_UNorm,
-                        SampleDescription = new SampleDescription(1, 0),
-                        Usage = ResourceUsage.Default,
-                        BindFlags = BindFlags.ShaderResource,
-                        CpuAccessFlags = CpuAccessFlags.None,
-                        OptionFlags = ResourceOptionFlags.None
-                    }, rect);
-
-                var shaderResourceView = new ShaderResourceView(Graphics.LowLevel.D11Device, tex2D);
-                Graphics.LowLevel.AddOrUpdateTexture(TextureName, shaderResourceView);
-                _areaDimensions = new Vector2i(width, height);
-            }
-
-            return processedTerrainData;
         }
 
-        private Vector2 GetPlayerPosition()
+        ImGui.SetNextWindowSize(new System.Numerics.Vector2(_rect.Width, _rect.Height));
+        ImGui.SetNextWindowPos(new System.Numerics.Vector2(_rect.Left, _rect.Top));
+
+        ImGui.Begin("radar_background",
+            ImGuiWindowFlags.NoDecoration |
+            ImGuiWindowFlags.NoInputs |
+            ImGuiWindowFlags.NoMove |
+            ImGuiWindowFlags.NoScrollWithMouse |
+            ImGuiWindowFlags.NoSavedSettings |
+            ImGuiWindowFlags.NoFocusOnAppearing |
+            ImGuiWindowFlags.NoBringToFrontOnFocus |
+            ImGuiWindowFlags.NoBackground);
+
+        _backGroundWindowPtr = ImGui.GetWindowDrawList();
+        var map = ingameUi.Map;
+        var largeMap = map.LargeMap.AsObject<SubMap>();
+        if (largeMap.IsVisible)
+        {
+            var mapCenter = largeMap.GetClientRect().TopLeft + largeMap.Shift + largeMap.DefaultShift;
+            //I have ABSOLUTELY NO IDEA where 677 comes from, but it works perfectly in all configurations I was able to test. Aspect ratio doesn't matter, just camera height
+            _mapScale = GameController.IngameState.Camera.Height / 677f * largeMap.Zoom * Settings.CustomScale;
+            DrawLargeMap(mapCenter);
+            DrawTargets(mapCenter);
+        }
+
+        DrawWorldPaths(largeMap);
+        ImGui.End();
+    }
+
+    private void DrawWorldPaths(SubMap largeMap)
+    {
+        if (Settings.PathfindingSettings.WorldPathSettings.ShowPathsToTargets &&
+            (!largeMap.IsVisible || !Settings.PathfindingSettings.WorldPathSettings.ShowPathsToTargetsOnlyWithClosedMap))
         {
             var player = GameController.Game.IngameState.Data.LocalPlayer;
-            var playerPositionComponent = player.GetComponent<Positioned>();
-            if (playerPositionComponent == null)
-                return new Vector2(0, 0);
-            var playerPosition = new Vector2(playerPositionComponent.GridX, playerPositionComponent.GridY);
-            return playerPosition;
-        }
-
-        private bool IsDescriptionInArea(string descriptionAreaPattern)
-        {
-            return GameController.Area.CurrentArea.Area.RawName.Like(descriptionAreaPattern);
-        }
-
-        private IEnumerable<TargetDescription> GetTargetDescriptionsInArea()
-        {
-            return _targetDescriptions.Where(x => IsDescriptionInArea(x.Key)).SelectMany(x => x.Value);
-        }
-
-        private ConcurrentDictionary<string, TargetLocations> ClusterTargets()
-        {
-            var tileMap = new ConcurrentDictionary<string, TargetLocations>();
-            Parallel.ForEach(_targetDescriptionsInArea.Values, new ParallelOptions { MaxDegreeOfParallelism = 1 }, target =>
-            {
-                var locations = ClusterTarget(target);
-                if (locations != null)
-                {
-                    tileMap[target.Name] = locations;
-                }
-            });
-            return tileMap;
-        }
-
-        private TargetLocations ClusterTarget(TargetDescription target)
-        {
-            if (!_allTargetLocations.TryGetValue(target.Name, out var tileList))
-                return null;
-            var clusterIndexes = KMeans.Cluster(tileList.Select(x => new Vector2d(x.X, x.Y)).ToArray(), target.ExpectedCount);
-            var resultList = new List<Vector2>();
-            foreach (var tileGroup in tileList.Zip(clusterIndexes).GroupBy(x => x.Second))
-            {
-                var v = new Vector2();
-                var count = 0;
-                foreach (var (vector, _) in tileGroup)
-                {
-                    var mult = IsGridWalkable(vector) ? 100 : 1;
-                    v += mult * vector.ToVector2();
-                    count += mult;
-                }
-
-                v /= count;
-                var replacement = tileGroup.Select(tile => new Vector2i(tile.First.X, tile.First.Y))
-                   .Where(IsGridWalkable)
-                   .OrderBy(x => (x.ToVector2() - v).LengthSquared())
-                   .Select(x => (Vector2i?)x)
-                   .FirstOrDefault();
-                if (replacement != null)
-                {
-                    v = replacement.Value.ToVector2();
-                }
-
-                if (!IsGridWalkable(v.Truncate()))
-                {
-                    v = GetAllNeighborTiles(v.Truncate()).First(IsGridWalkable).ToVector2();
-                }
-
-                resultList.Add(v);
-            }
-
-            return new TargetLocations
-            {
-                Locations = resultList.Distinct().ToArray(),
-                DisplayName = target.DisplayName
-            };
-        }
-
-        private bool IsGridWalkable(Vector2i tile)
-        {
-            return _processedTerrainData[tile.Y][tile.X] is 5 or 4;
-        }
-
-        private IEnumerable<Vector2i> GetAllNeighborTiles(Vector2i start)
-        {
-            foreach (var range in Enumerable.Range(1, 100000))
-            {
-                var xStart = Math.Max(0, start.X - range);
-                var yStart = Math.Max(0, start.Y - range);
-                var xEnd = Math.Min(_areaDimensions.Value.X, start.X + range);
-                var yEnd = Math.Min(_areaDimensions.Value.Y, start.Y + range);
-                for (var x = xStart; x <= xEnd; x++)
-                {
-                    yield return new Vector2i(x, yStart);
-                    yield return new Vector2i(x, yEnd);
-                }
-
-                for (var y = yStart + 1; y <= yEnd - 1; y++)
-                {
-                    yield return new Vector2i(xStart, y);
-                    yield return new Vector2i(xEnd, y);
-                }
-
-                if (xStart == 0 && yStart == 0 && xEnd == _areaDimensions.Value.X && yEnd == _areaDimensions.Value.Y)
-                {
-                    break;
-                }
-            }
-        }
-
-        public override void Render()
-        {
-            var ingameUi = GameController.Game.IngameState.IngameUi;
-            if (ingameUi.DelveWindow.IsVisible ||
-                ingameUi.Atlas.IsVisible ||
-                ingameUi.SellWindow.IsVisible)
-            {
-                return;
-            }
-
-            var map = ingameUi.Map;
-            var largeMap = map.LargeMap.AsObject<SubMap>();
-            if (largeMap.IsVisible)
-            {
-                var mapCenter = largeMap.GetClientRect().TopLeft + largeMap.Shift + largeMap.DefaultShift;
-                //I have ABSOLUTELY NO IDEA where 677 comes from, but it works perfectly in all configurations I was able to test. Aspect ratio doesn't matter, just camera height
-                _mapScale = GameController.IngameState.Camera.Height / 677f * largeMap.Zoom * Settings.CustomScale;
-                DrawLargeMap(mapCenter);
-                DrawTargets(mapCenter);
-            }
-        }
-
-        private Vector2 TranslateGridDeltaToMapDelta(Vector2 delta, float deltaZ)
-        {
-            deltaZ /= GridToWorldMultiplier; //z is normally "world" units, translate to grid
-            return (float)_mapScale * new Vector2((delta.X - delta.Y) * CameraAngleCos, (deltaZ - (delta.X + delta.Y)) * CameraAngleSin);
-        }
-
-        private void DrawLargeMap(Vector2 mapCenter)
-        {
-            if (!Settings.DrawWalkableMap || !Graphics.LowLevel.HasTexture(TextureName) || _areaDimensions == null)
-                return;
-            var player = GameController.Game.IngameState.Data.LocalPlayer;
-            var playerRender = player.GetComponent<ExileCore.PoEMemory.Components.Render>();
+            var playerRender = player?.GetComponent<ExileCore.PoEMemory.Components.Render>();
             if (playerRender == null)
                 return;
-            var rectangleF = new RectangleF(-playerRender.GridPos().X, -playerRender.GridPos().Y, _areaDimensions.Value.X, _areaDimensions.Value.Y);
-            var playerHeight = -playerRender.RenderStruct.Height;
-            var p1 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Top), playerHeight);
-            var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
-            var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
-            var p4 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Bottom), playerHeight);
-            Graphics.DrawTexture(Graphics.LowLevel.GetTexture(TextureName).NativePointer, p1, p2, p3, p4);
+            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.Pos with { Z = playerRender.RenderStruct.Height });
+            foreach (var (route, offsetAmount) in _routes.Values
+                        .GroupBy(x => x.Path.Count < 2 ? 0 : (x.Path[1] - x.Path[0]) switch { var diff => Math.Atan2(diff.Y, diff.X) })
+                        .SelectMany(group => group.Select((route, i) => (route, i - group.Count() / 2.0f + 0.5f))))
+            {
+                var p0 = initPos;
+                var p0WithOffset = p0;
+                var i = 0;
+                foreach (var elem in route.Path)
+                {
+                    var p1 = GameController.IngameState.Camera.WorldToScreen(
+                        new Vector3(elem.X * GridToWorldMultiplier, elem.Y * GridToWorldMultiplier, -_heightData[elem.Y][elem.X]));
+                    var offsetDirection = Settings.PathfindingSettings.WorldPathSettings.OffsetPaths
+                                              ? (p1 - p0) switch { var s => new Vector2(s.Y, -s.X) / s.Length() }
+                                              : Vector2.Zero;
+                    var finalOffset = offsetDirection * offsetAmount * Settings.PathfindingSettings.WorldPathSettings.PathThickness;
+                    p0 = p1;
+                    p1 += finalOffset;
+                    if (++i % Settings.PathfindingSettings.WorldPathSettings.DrawEveryNthSegment == 0)
+                    {
+                        if (_rect.Contains(p0WithOffset) || _rect.Contains(p1))
+                        {
+                            Graphics.DrawLine(p0WithOffset, p1, Settings.PathfindingSettings.WorldPathSettings.PathThickness, route.WorldColor());
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    p0WithOffset = p1;
+                }
+            }
+        }
+    }
+
+    private void DrawBox(Vector2 p0, Vector2 p1, Color color)
+    {
+        _backGroundWindowPtr.AddRectFilled(p0.ToVector2Num(), p1.ToVector2Num(), color.ToImgui());
+    }
+
+    private void DrawText(string text, Vector2 pos, Color color)
+    {
+        _backGroundWindowPtr.AddText(pos.ToVector2Num(), color.ToImgui(), text);
+    }
+
+    private Vector2 TranslateGridDeltaToMapDelta(Vector2 delta, float deltaZ)
+    {
+        deltaZ /= GridToWorldMultiplier; //z is normally "world" units, translate to grid
+        return (float)_mapScale * new Vector2((delta.X - delta.Y) * CameraAngleCos, (deltaZ - (delta.X + delta.Y)) * CameraAngleSin);
+    }
+
+    private void DrawLargeMap(Vector2 mapCenter)
+    {
+        if (!Settings.DrawWalkableMap || !Graphics.LowLevel.HasTexture(TextureName) || _areaDimensions == null)
+            return;
+        var player = GameController.Game.IngameState.Data.LocalPlayer;
+        var playerRender = player.GetComponent<ExileCore.PoEMemory.Components.Render>();
+        if (playerRender == null)
+            return;
+        var rectangleF = new RectangleF(-playerRender.GridPos().X, -playerRender.GridPos().Y, _areaDimensions.Value.X, _areaDimensions.Value.Y);
+        var playerHeight = -playerRender.RenderStruct.Height;
+        var p1 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Top), playerHeight);
+        var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
+        var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
+        var p4 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Bottom), playerHeight);
+        _backGroundWindowPtr.AddImageQuad(Graphics.LowLevel.GetTexture(TextureName).NativePointer, p1.ToVector2Num(), p2.ToVector2Num(), p3.ToVector2Num(), p4.ToVector2Num());
+    }
+
+    private void DrawTargets(Vector2 mapCenter)
+    {
+        var col = Settings.PathfindingSettings.TargetNameColor.Value;
+        var player = GameController.Game.IngameState.Data.LocalPlayer;
+        var playerRender = player.GetComponent<ExileCore.PoEMemory.Components.Render>();
+        if (playerRender == null)
+            return;
+        var playerPosition = new Vector2(playerRender.GridPos().X, playerRender.GridPos().Y);
+        var playerHeight = -playerRender.RenderStruct.Height;
+        var ithElement = 0;
+        if (Settings.PathfindingSettings.ShowPathsToTargetsOnMap)
+        {
+            foreach (var route in _routes.Values)
+            {
+                ithElement++;
+                ithElement %= 5;
+                foreach (var elem in route.Path.Skip(ithElement).GetEveryNth(5))
+                {
+                    var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight - _heightData[elem.Y][elem.X]);
+                    DrawBox(mapCenter + mapDelta - new Vector2(2, 2), mapCenter + mapDelta + new Vector2(2, 2), route.MapColor());
+                }
+            }
         }
 
-        private void DrawTargets(Vector2 mapCenter)
+        if (Settings.PathfindingSettings.ShowAllTargets)
         {
-            var col = Settings.TargetNameColor.Value;
-            var player = GameController.Game.IngameState.Data.LocalPlayer;
-            var playerRender = player.GetComponent<ExileCore.PoEMemory.Components.Render>();
-            if (playerRender == null)
-                return;
-            var playerPosition = new Vector2(playerRender.GridPos().X, playerRender.GridPos().Y);
-            var playerHeight = -playerRender.RenderStruct.Height;
-            var ithElement = 0;
-            if (Settings.ShowPathsToTargets && (Settings.ShowAllTargets || Settings.ShowSelectedTargets))
+            foreach (var (tileName, targetList) in _allTargetLocations)
             {
-                foreach (var route in _routes.Values)
+                var textOffset = (Graphics.MeasureText(tileName) / 2f).ToSdx();
+                foreach (var vector in targetList)
                 {
-                    ithElement++;
-                    ithElement %= 5;
-                    foreach (var elem in route.Path.Skip(ithElement).GetEveryNth(5))
-                    {
-                        var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight - _heightData[elem.Y][elem.X]);
-                        Graphics.DrawBox(mapCenter + mapDelta - new Vector2(2, 2), mapCenter + mapDelta + new Vector2(2, 2), Settings.DefaultPathColor);
-                    }
+                    var mapDelta = TranslateGridDeltaToMapDelta(vector.ToVector2() - playerPosition, playerHeight - _heightData[vector.Y][vector.X]);
+                    if (Settings.PathfindingSettings.EnableTargetNameBackground)
+                        DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
+                    DrawText(tileName, mapCenter + mapDelta - textOffset, col);
                 }
             }
-
-            if (Settings.ShowAllTargets)
+        }
+        else if (Settings.PathfindingSettings.ShowSelectedTargets)
+        {
+            foreach (var (name, description) in _clusteredTargetLocations)
             {
-                foreach (var (tileName, targetList) in _allTargetLocations)
+                foreach (var clusterPosition in description.Locations)
                 {
-                    var textOffset = (Graphics.MeasureText(tileName) / 2f).ToSdx();
-                    foreach (var vector in targetList)
-                    {
-                        var mapDelta = TranslateGridDeltaToMapDelta(vector.ToVector2() - playerPosition, playerHeight - _heightData[vector.Y][vector.X]);
-                        if (Settings.EnableTargetNameBackground)
-                            Graphics.DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
-                        Graphics.DrawText(tileName, mapCenter + mapDelta - textOffset, col);
-                    }
-                }
-            }
-            else if (Settings.ShowSelectedTargets)
-            {
-                foreach (var (name, description) in _clusteredTargetLocations)
-                {
-                    foreach (var clusterPosition in description.Locations)
-                    {
-                        float clusterHeight = 0;
-                        if (clusterPosition.X < _heightData[0].Length && clusterPosition.Y < _heightData.Length)
-                            clusterHeight = _heightData[(int)clusterPosition.Y][(int)clusterPosition.X];
-                        var text = string.IsNullOrWhiteSpace(description.DisplayName) ? name : description.DisplayName;
-                        var textOffset = (Graphics.MeasureText(text) / 2f).ToSdx();
-                        var mapDelta = TranslateGridDeltaToMapDelta(clusterPosition - playerPosition, playerHeight - clusterHeight);
-                        if (Settings.EnableTargetNameBackground)
-                            Graphics.DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
-                        Graphics.DrawText(text, mapCenter + mapDelta - textOffset, col);
-                    }
+                    float clusterHeight = 0;
+                    if (clusterPosition.X < _heightData[0].Length && clusterPosition.Y < _heightData.Length)
+                        clusterHeight = _heightData[(int)clusterPosition.Y][(int)clusterPosition.X];
+                    var text = string.IsNullOrWhiteSpace(description.DisplayName) ? name : description.DisplayName;
+                    var textOffset = (Graphics.MeasureText(text) / 2f).ToSdx();
+                    var mapDelta = TranslateGridDeltaToMapDelta(clusterPosition - playerPosition, playerHeight - clusterHeight);
+                    if (Settings.PathfindingSettings.EnableTargetNameBackground)
+                        DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
+                    DrawText(text, mapCenter + mapDelta - textOffset, col);
                 }
             }
         }
