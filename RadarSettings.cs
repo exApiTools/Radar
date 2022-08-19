@@ -16,6 +16,8 @@ public class DebugSettings
     public ToggleNode SkipRecoloring { get; set; } = new ToggleNode(false);
     public ToggleNode DisableDrawRegionLimiting { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
+    public RangeNode<int> MapCenterOffsetX { get; set; } = new RangeNode<int>(0, -1000, 1000);
+    public RangeNode<int> MapCenterOffsetY { get; set; } = new RangeNode<int>(0, -1000, 1000);
 }
 
 [Submenu]
