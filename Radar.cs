@@ -268,7 +268,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
         var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
         var p4 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Bottom), playerHeight);
-        _backGroundWindowPtr.AddImageQuad(Graphics.LowLevel.GetTexture(TextureName).NativePointer, p1.ToVector2Num(), p2.ToVector2Num(), p3.ToVector2Num(), p4.ToVector2Num());
+        _backGroundWindowPtr.AddImageQuad(Graphics.LowLevel.GetTexture(TextureName), p1.ToVector2Num(), p2.ToVector2Num(), p3.ToVector2Num(), p4.ToVector2Num());
     }
 
     private void DrawTargets(Vector2 mapCenter)

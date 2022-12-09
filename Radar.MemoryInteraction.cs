@@ -1,13 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
-using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -22,7 +18,7 @@ public partial class Radar
     private byte[] GetRotationSelector()
     {
         var pattern = new Pattern(
-            "?? 8D ?? ^ ?? ?? ?? ?? 0F B6 ?? ?? 88 ?? ?? ?? ?? 8D ?? ?? ?? 8D ?? ?? E8 ?? ?? ?? ?? ?? 8B ?? ?? ??",
+            "?? 8D ?? ^ ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 8D ?? ?? ?? ?? 8B ?? 0F B6 ?? ?? ?? 8D ?? ?? ?? 88 ?? ?? ??",
             "Terrain Rotation Selector");
         var address = GameController.Memory.FindPatterns(pattern)[0];
 
@@ -103,12 +99,14 @@ public partial class Radar
         var gridHeightData = _heightData;
         var maxX = _areaDimensions.Value.X;
         var maxY = _areaDimensions.Value.Y;
-        using var image = new Image<Rgba32>(maxX, maxY);
+        var configuration = Configuration.Default.Clone();
+        configuration.PreferContiguousImageBuffers = true;
+        using var image = new Image<Rgba32>(configuration, maxX, maxY);
         if (Settings.Debug.DrawHeightMap)
         {
             var minHeight = gridHeightData.Min(x => x.Min());
             var maxHeight = gridHeightData.Max(x => x.Max());
-            image.Mutate(c => c.ProcessPixelRowsAsVector4((row, i) =>
+            image.Mutate(configuration, c => c.ProcessPixelRowsAsVector4((row, i) =>
             {
                 for (var x = 0; x < row.Length - 1; x += 2)
                 {
@@ -200,13 +198,13 @@ public partial class Radar
                         { -1, -1, -1, -1, -1 },
                         { -1, -1, -1, -1, -1 },
                     })), false)
-                   .CreatePixelSpecificProcessor(Configuration.Default, image, image.Bounds());
+                   .CreatePixelSpecificProcessor(configuration, image, image.Bounds());
                 edgeDetector.Execute();
             }
 
             if (!Settings.Debug.SkipRecoloring)
             {
-                image.Mutate(c => c.ProcessPixelRowsAsVector4((row, p) =>
+                image.Mutate(configuration, c => c.ProcessPixelRowsAsVector4((row, p) =>
                 {
                     for (var x = 0; x < row.Length - 0; x++)
                     {
@@ -221,32 +219,9 @@ public partial class Radar
             }
         }
 
-        image.TryGetSinglePixelSpan(out var span);
-        var width = image.Width;
-        var height = image.Height;
-        var bytesPerPixel = image.PixelType.BitsPerPixel / 8;
-        fixed (Rgba32* rgba32Ptr = &MemoryMarshal.GetReference<Rgba32>(span))
-        {
-            var rect = new DataRectangle(new IntPtr(rgba32Ptr), width * bytesPerPixel);
-
-            using var tex2D = new Texture2D(Graphics.LowLevel.D11Device,
-                new Texture2DDescription
-                {
-                    Width = width,
-                    Height = height,
-                    MipLevels = 1,
-                    ArraySize = 1,
-                    Format = Format.R8G8B8A8_UNorm,
-                    SampleDescription = new SampleDescription(1, 0),
-                    Usage = ResourceUsage.Default,
-                    BindFlags = BindFlags.ShaderResource,
-                    CpuAccessFlags = CpuAccessFlags.None,
-                    OptionFlags = ResourceOptionFlags.None
-                }, rect);
-
-            var shaderResourceView = new ShaderResourceView(Graphics.LowLevel.D11Device, tex2D);
-            Graphics.LowLevel.AddOrUpdateTexture(TextureName, shaderResourceView);
-        }
+        //unfortunately the library doesn't respect our allocation settings above
+        using var imageCopy = image.Clone(configuration);
+        Graphics.LowLevel.AddOrUpdateTexture(TextureName, imageCopy);
     }
 
     private int[][] ParseTerrainPathData()
