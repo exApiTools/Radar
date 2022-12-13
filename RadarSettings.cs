@@ -38,7 +38,7 @@ public class PathfindingSettings
     public ToggleNode ShowPathsToTargetsOnMap { get; set; } = new ToggleNode(true);
     public ColorNode DefaultMapPathColor { get; set; } = new ColorNode(Color.Green);
     public ToggleNode UseRainbowColorsForMapPaths { get; set; } = new ToggleNode(true);
-    public ToggleNode ShowAllTargets { get; set; } = new ToggleNode(true);
+    public ToggleNode ShowAllTargets { get; set; } = new ToggleNode(false);
     public ToggleNode ShowSelectedTargets { get; set; } = new ToggleNode(true);
     public ToggleNode EnableTargetNameBackground { get; set; } = new ToggleNode(true);
     public ColorNode TargetNameColor { get; set; } = new ColorNode(Color.Violet);
