@@ -99,6 +99,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         Settings.Debug.SkipNeighborFill.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.SkipRecoloring.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.DisableHeightAdjust.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.MaximumMapTextureDimension.OnValueChanged += (_, _) => { GenerateMapTexture(); };
     }
 
     public override void EntityAdded(Entity entity)

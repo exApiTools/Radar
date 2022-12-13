@@ -54,6 +54,7 @@ public class RadarSettings : ISettings
     public RangeNode<float> CustomScale { get; set; } = new RangeNode<float>(1, 0.1f, 10);
     public ToggleNode DrawWalkableMap { get; set; } = new ToggleNode(true);
     public ColorNode TerrainColor { get; set; } = new ColorNode(new Color(new Vector3(150f) / byte.MaxValue));
+    public RangeNode<int> MaximumMapTextureDimension { get; set; } = new RangeNode<int>(4096, 100, 4096);
     public RangeNode<int> MaximumPathCount { get; set; } = new RangeNode<int>(1000, 0, 1000);
     public PathfindingSettings PathfindingSettings { get; set; } = new PathfindingSettings();
     public DebugSettings Debug { get; set; } = new DebugSettings();

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ExileCore.Shared.Helpers;
@@ -8,6 +9,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Convolution;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using Configuration = SixLabors.ImageSharp.Configuration;
 using Vector4 = System.Numerics.Vector4;
 
@@ -219,7 +221,28 @@ public partial class Radar
             }
         }
 
+        if (Math.Max(image.Height, image.Width) > Settings.MaximumMapTextureDimension)
+        {
+            var (newWidth, newHeight) = (image.Width, image.Height);
+            if (image.Height > image.Width)
+            {
+                newWidth = newWidth * Settings.MaximumMapTextureDimension / newHeight;
+                newHeight = Settings.MaximumMapTextureDimension;
+            }
+            else
+            {
+                newHeight = newHeight * Settings.MaximumMapTextureDimension / newWidth;
+                newWidth = Settings.MaximumMapTextureDimension;
+            }
+
+            var targetSize = new Size(newWidth, newHeight);
+            var resizer = new ResizeProcessor(new ResizeOptions { Size = targetSize }, image.Size())
+                .CreatePixelSpecificCloningProcessor(configuration, image, image.Bounds());
+            resizer.Execute();
+        }
+
         //unfortunately the library doesn't respect our allocation settings above
+        
         using var imageCopy = image.Clone(configuration);
         Graphics.LowLevel.AddOrUpdateTexture(TextureName, imageCopy);
     }
