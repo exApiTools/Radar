@@ -125,7 +125,7 @@ public partial class Radar
 
     private Dictionary<string, List<Vector2i>> GetTileTargets()
     {
-        var tileData = GameController.Memory.ReadStdVector<TileStructure>(Cast(_terrainMetadata.TgtArray));
+        var tileData = GameController.Memory.ReadStdVector<TileStructure>(_terrainMetadata.TgtArray);
         var ret = new ConcurrentDictionary<string, ConcurrentQueue<Vector2i>>();
         Parallel.For(0, tileData.Length, tileNumber =>
         {

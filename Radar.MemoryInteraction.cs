@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ExileCore.Shared.Helpers;
-using GameOffsets;
-using GameOffsets.Native;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -17,86 +14,7 @@ namespace Radar;
 
 public partial class Radar
 {
-    private byte[] GetRotationSelector()
-    {
-        var pattern = new Pattern(
-            "?? 8D ?? ^ ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 8D ?? ?? ?? ?? 8B ?? 0F B6 ?? ?? ?? 8D ?? ?? ?? 88 ?? ?? ??",
-            "Terrain Rotation Selector");
-        var address = GameController.Memory.FindPatterns(pattern)[0];
-
-        var realAddress = GameController.Memory.Read<int>(GameController.Memory.AddressOfProcess + address + pattern.PatternOffset) + address + pattern.PatternOffset + 4;
-        return GameController.Memory.ReadBytes(GameController.Memory.AddressOfProcess + realAddress, 8);
-    }
-
-    private byte[] GetRotationHelper()
-    {
-        var pattern = new Pattern("?? 8D ?? ^ ?? ?? ?? ?? ?? 03 ?? 8B ?? ?? 2B ?? 89 ?? ?? ?? 8B ?? ?? ?? FF ??", "Terrain Rotator Helper");
-        var address = GameController.Memory.FindPatterns(pattern)[0];
-
-        var realAddress = GameController.Memory.Read<int>(GameController.Memory.AddressOfProcess + address + pattern.PatternOffset) + address + pattern.PatternOffset + 4;
-        return GameController.Memory.ReadBytes(GameController.Memory.AddressOfProcess + realAddress, 24);
-    }
-
-    private static StdVector Cast(NativePtrArray nativePtrArray)
-    {
-        //PepeLa
-        //this is going to break one day and everyone's gonna be sorry, but I'm leaving this
-        return MemoryMarshal.Cast<NativePtrArray, StdVector>(stackalloc NativePtrArray[] { nativePtrArray })[0];
-    }
-
-    private float[][] GetTerrainHeight()
-    {
-        var rotationSelector = RotationSelector;
-        var rotationHelper = RotationHelper;
-        var tileData = GameController.Memory.ReadStdVector<TileStructure>(Cast(_terrainMetadata.TgtArray));
-        var tileHeightCache = tileData.Select(x => x.SubTileDetailsPtr)
-           .Distinct()
-           .AsParallel()
-           .Select(addr => new
-            {
-                addr,
-                data = GameController.Memory.ReadStdVector<sbyte>(GameController.Memory.Read<SubTileStructure>(addr).SubTileHeight)
-            })
-           .ToDictionary(x => x.addr, x => x.data);
-        var gridSizeX = _terrainMetadata.NumCols * TileToGridConversion;
-        var toExclusive = _terrainMetadata.NumRows * TileToGridConversion;
-        var result = new float[toExclusive][];
-        Parallel.For(0, toExclusive, y =>
-        {
-            result[y] = new float[gridSizeX];
-            for (var x = 0; x < gridSizeX; ++x)
-            {
-                var tileStructure = tileData[y / TileToGridConversion * _terrainMetadata.NumCols + x / TileToGridConversion];
-                var tileHeightArray = tileHeightCache[tileStructure.SubTileDetailsPtr];
-                var tileHeight = 0;
-                if (tileHeightArray.Length != 0)
-                {
-                    var gridX = x % TileToGridConversion;
-                    var gridY = y % TileToGridConversion;
-                    var maxCoordInTile = TileToGridConversion - 1;
-                    int[] coordHelperArray =
-                    {
-                        maxCoordInTile - gridX,
-                        gridX,
-                        maxCoordInTile - gridY,
-                        gridY
-                    };
-                    var rotationIndex = rotationSelector[tileStructure.RotationSelector] * 3;
-                    int axisSwitch = rotationHelper[rotationIndex];
-                    int smallAxisFlip = rotationHelper[rotationIndex + 1];
-                    int largeAxisFlip = rotationHelper[rotationIndex + 2];
-                    var smallIndex = coordHelperArray[axisSwitch * 2 + smallAxisFlip];
-                    var index = coordHelperArray[largeAxisFlip + (1 - axisSwitch) * 2] * TileToGridConversion + smallIndex;
-                    tileHeight = tileHeightArray[index];
-                }
-
-                result[y][x] = (float)((tileStructure.TileHeight * (int)_terrainMetadata.TileHeightMultiplier + tileHeight) * TileHeightFinalMultiplier);
-            }
-        });
-        return result;
-    }
-
-    private unsafe void GenerateMapTexture()
+    private void GenerateMapTexture()
     {
         var gridHeightData = _heightData;
         var maxX = _areaDimensions.Value.X;
@@ -145,8 +63,8 @@ public partial class Radar
 
                         //basically, offset x and y by half the offset z would cause when rendering in 3d
                         var heightOffset = (int)(cellData / GridToWorldMultiplier / 2);
-                        var offsetX = x + heightOffset;
-                        var offsetY = y + heightOffset;
+                        var offsetX = x - heightOffset;
+                        var offsetY = y - heightOffset;
                         var terrainType = _processedTerrainData[y][x];
                         if (offsetX >= 0 && offsetX < maxX && offsetY >= 0 && offsetY < maxY)
                         {
@@ -245,34 +163,5 @@ public partial class Radar
         
         using var imageCopy = image.Clone(configuration);
         Graphics.LowLevel.AddOrUpdateTexture(TextureName, imageCopy);
-    }
-
-    private int[][] ParseTerrainPathData()
-    {
-        var mapTextureData = _rawTerrainData;
-        var bytesPerRow = _terrainMetadata.BytesPerRow;
-        var totalRows = mapTextureData.Length / bytesPerRow;
-        var processedTerrainData = new int[totalRows][];
-        var xSize = bytesPerRow * 2;
-        _areaDimensions = new Vector2i(xSize, totalRows);
-        for (var i = 0; i < totalRows; i++)
-        {
-            processedTerrainData[i] = new int[xSize];
-        }
-
-        Parallel.For(0, totalRows, y =>
-        {
-            for (var x = 0; x < xSize; x += 2)
-            {
-                var dateElement = mapTextureData[y * bytesPerRow + x / 2];
-                for (var xs = 0; xs < 2; xs++)
-                {
-                    var rawPathType = dateElement >> 4 * xs & 15;
-                    processedTerrainData[y][x + xs] = rawPathType;
-                }
-            }
-        });
-
-        return processedTerrainData;
     }
 }

@@ -24,7 +24,6 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private const int TileToGridConversion = 23;
     private const int TileToWorldConversion = 250;
     public const float GridToWorldMultiplier = TileToWorldConversion / (float)TileToGridConversion;
-    private const double TileHeightFinalMultiplier = 125 / 16.0; //this translates the height in the tile metadata to
     private const double CameraAngle = 38.7 * Math.PI / 180;
     private static readonly float CameraAngleCos = (float)Math.Cos(CameraAngle);
     private static readonly float CameraAngleSin = (float)Math.Sin(CameraAngle);
@@ -34,7 +33,6 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private Vector2i? _areaDimensions;
     private TerrainData _terrainMetadata;
     private float[][] _heightData;
-    private byte[] _rawTerrainData;
     private int[][] _processedTerrainData;
     private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
     private HashSet<string> _currentZoneTargetEntityPaths = new();
@@ -42,10 +40,6 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
     private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
     private ConcurrentDictionary<Vector2, RouteDescription> _routes = new();
-    private byte[] _rotationSelectorCache;
-    private byte[] RotationSelector => _rotationSelectorCache ??= GetRotationSelector();
-    private byte[] _rotationHelperCache;
-    private byte[] RotationHelper => _rotationHelperCache ??= GetRotationHelper();
 
     public override void AreaChange(AreaInstance area)
     {
@@ -55,10 +49,10 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             _targetDescriptionsInArea = GetTargetDescriptionsInArea().ToDictionary(x => x.Name);
             _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).Select(x => x.Name).ToHashSet();
             _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
-            _rawTerrainData = GameController.Memory.ReadStdVector<byte>(Cast(_terrainMetadata.LayerMelee));
-            _heightData = GetTerrainHeight();
+            _heightData = GameController.IngameState.Data.RawTerrainHeightData;
             _allTargetLocations = GetTargets();
-            _processedTerrainData = ParseTerrainPathData();
+            _areaDimensions = GameController.IngameState.Data.AreaDimensions;
+            _processedTerrainData = GameController.IngameState.Data.RawPathfindingData;
             GenerateMapTexture();
             _clusteredTargetLocations = ClusterTargets();
             StartPathFinding();
@@ -214,7 +208,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 foreach (var elem in route.Path)
                 {
                     var p1 = GameController.IngameState.Camera.WorldToScreen(
-                        new Vector3(elem.X * GridToWorldMultiplier, elem.Y * GridToWorldMultiplier, -_heightData[elem.Y][elem.X]));
+                        new Vector3(elem.X * GridToWorldMultiplier, elem.Y * GridToWorldMultiplier, _heightData[elem.Y][elem.X]));
                     var offsetDirection = Settings.PathfindingSettings.WorldPathSettings.OffsetPaths
                                               ? (p1 - p0) switch { var s => new Vector2(s.Y, -s.X) / s.Length() }
                                               : Vector2.Zero;
@@ -290,7 +284,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 ithElement %= 5;
                 foreach (var elem in route.Path.Skip(ithElement).GetEveryNth(5))
                 {
-                    var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight - _heightData[elem.Y][elem.X]);
+                    var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight +_heightData[elem.Y][elem.X]);
                     DrawBox(mapCenter + mapDelta - new Vector2(2, 2), mapCenter + mapDelta + new Vector2(2, 2), route.MapColor());
                 }
             }
@@ -303,7 +297,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 var textOffset = (Graphics.MeasureText(tileName) / 2f).ToSdx();
                 foreach (var vector in targetList)
                 {
-                    var mapDelta = TranslateGridDeltaToMapDelta(vector.ToVector2() - playerPosition, playerHeight - _heightData[vector.Y][vector.X]);
+                    var mapDelta = TranslateGridDeltaToMapDelta(vector.ToVector2() - playerPosition, playerHeight + _heightData[vector.Y][vector.X]);
                     if (Settings.PathfindingSettings.EnableTargetNameBackground)
                         DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
                     DrawText(tileName, mapCenter + mapDelta - textOffset, col);
@@ -321,7 +315,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                         clusterHeight = _heightData[(int)clusterPosition.Y][(int)clusterPosition.X];
                     var text = string.IsNullOrWhiteSpace(description.DisplayName) ? name : description.DisplayName;
                     var textOffset = (Graphics.MeasureText(text) / 2f).ToSdx();
-                    var mapDelta = TranslateGridDeltaToMapDelta(clusterPosition - playerPosition, playerHeight - clusterHeight);
+                    var mapDelta = TranslateGridDeltaToMapDelta(clusterPosition - playerPosition, playerHeight + clusterHeight);
                     if (Settings.PathfindingSettings.EnableTargetNameBackground)
                         DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
                     DrawText(text, mapCenter + mapDelta - textOffset, col);
