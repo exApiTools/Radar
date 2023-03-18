@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;
-using SharpDX;
 
 namespace Radar;
 
@@ -10,7 +10,7 @@ public static class Extensions
 {
     public static Vector3 GridPos(this Render render)
     {
-        return render.Pos / Radar.GridToWorldMultiplier;
+        return render.PosNum / Radar.GridToWorldMultiplier;
     }
 
     public static Vector2 ToSdx(this System.Numerics.Vector2 v)

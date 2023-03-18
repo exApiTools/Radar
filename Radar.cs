@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using ExileCore;
 using ExileCore.PoEMemory.Elements;
@@ -11,7 +12,6 @@ using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
 using ImGuiNET;
-using SharpDX;
 using Color = SharpDX.Color;
 using Positioned = ExileCore.PoEMemory.Components.Positioned;
 using RectangleF = SixLabors.ImageSharp.RectangleF;
@@ -105,9 +105,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             if (_currentZoneTargetEntityPaths.Contains(path))
             {
                 bool alreadyContains = false;
-                _allTargetLocations.AddOrUpdate(path, _ => new List<Vector2i> { positioned.GridPos.Truncate() },
+                _allTargetLocations.AddOrUpdate(path, _ => new List<Vector2i> { positioned.GridPosNum.Truncate() },
                     // ReSharper disable once AssignmentInConditionalExpression
-                    (_, l) => (alreadyContains = l.Contains(positioned.GridPos.Truncate())) ? l : l.Append(positioned.GridPos.Truncate()).ToList());
+                    (_, l) => (alreadyContains = l.Contains(positioned.GridPosNum.Truncate())) ? l : l.Append(positioned.GridPosNum.Truncate()).ToList());
                 if (!alreadyContains)
                 {
                     var oldValue = _clusteredTargetLocations.GetValueOrDefault(path);
@@ -145,7 +145,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             return;
         }
 
-        _rect = GameController.Window.GetWindowRectangle() with { Location = Vector2.Zero };
+        _rect = GameController.Window.GetWindowRectangle() with { Location = Vector2.Zero.ToSharpDx() };
         if (!Settings.Debug.DisableDrawRegionLimiting)
         {
             if (ingameUi.OpenRightPanel.IsVisible)
@@ -177,7 +177,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         var largeMap = map.LargeMap.AsObject<SubMap>();
         if (largeMap.IsVisible)
         {
-            var mapCenter = largeMap.GetClientRect().TopLeft + largeMap.Shift + largeMap.DefaultShift + new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
+            var mapCenter = largeMap.GetClientRect().TopLeft.ToVector2Num() + largeMap.ShiftNum + largeMap.DefaultShiftNum + new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
             //I have ABSOLUTELY NO IDEA where 677 comes from, but it works perfectly in all configurations I was able to test. Aspect ratio doesn't matter, just camera height
             _mapScale = GameController.IngameState.Camera.Height / 677f * largeMap.Zoom * Settings.CustomScale;
             DrawLargeMap(mapCenter);
@@ -197,7 +197,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             var playerRender = player?.GetComponent<ExileCore.PoEMemory.Components.Render>();
             if (playerRender == null)
                 return;
-            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.Pos with { Z = playerRender.RenderStruct.Height });
+            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.PosNum with { Z = playerRender.RenderStruct.Height });
             foreach (var (route, offsetAmount) in _routes.Values
                         .GroupBy(x => x.Path.Count < 2 ? 0 : (x.Path[1] - x.Path[0]) switch { var diff => Math.Atan2(diff.Y, diff.X) })
                         .SelectMany(group => group.Select((route, i) => (route, i - group.Count() / 2.0f + 0.5f))))
@@ -235,12 +235,12 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
     private void DrawBox(Vector2 p0, Vector2 p1, Color color)
     {
-        _backGroundWindowPtr.AddRectFilled(p0.ToVector2Num(), p1.ToVector2Num(), color.ToImgui());
+        _backGroundWindowPtr.AddRectFilled(p0, p1, color.ToImgui());
     }
 
     private void DrawText(string text, Vector2 pos, Color color)
     {
-        _backGroundWindowPtr.AddText(pos.ToVector2Num(), color.ToImgui(), text);
+        _backGroundWindowPtr.AddText(pos, color.ToImgui(), text);
     }
 
     private Vector2 TranslateGridDeltaToMapDelta(Vector2 delta, float deltaZ)
@@ -263,7 +263,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
         var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
         var p4 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Bottom), playerHeight);
-        _backGroundWindowPtr.AddImageQuad(Graphics.LowLevel.GetTexture(TextureName), p1.ToVector2Num(), p2.ToVector2Num(), p3.ToVector2Num(), p4.ToVector2Num());
+        _backGroundWindowPtr.AddImageQuad(Graphics.LowLevel.GetTexture(TextureName), p1, p2, p3, p4);
     }
 
     private void DrawTargets(Vector2 mapCenter)
@@ -297,7 +297,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 var textOffset = (Graphics.MeasureText(tileName) / 2f).ToSdx();
                 foreach (var vector in targetList)
                 {
-                    var mapDelta = TranslateGridDeltaToMapDelta(vector.ToVector2() - playerPosition, playerHeight + _heightData[vector.Y][vector.X]);
+                    var mapDelta = TranslateGridDeltaToMapDelta(vector.ToVector2Num() - playerPosition, playerHeight + _heightData[vector.Y][vector.X]);
                     if (Settings.PathfindingSettings.EnableTargetNameBackground)
                         DrawBox(mapCenter + mapDelta - textOffset, mapCenter + mapDelta + textOffset, Color.Black);
                     DrawText(tileName, mapCenter + mapDelta - textOffset, col);

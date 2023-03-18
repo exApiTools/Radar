@@ -11,6 +11,7 @@ using GameOffsets;
 using GameOffsets.Native;
 using Newtonsoft.Json;
 using SharpDX;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Radar;
 
@@ -119,7 +120,7 @@ public partial class Radar
     private Dictionary<string, List<Vector2i>> GetEntityTargets()
     {
         return GameController.Entities.Where(x => x.HasComponent<Positioned>()).Where(x => _currentZoneTargetEntityPaths.Contains(x.Path))
-           .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPos.Truncate())
+           .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPosNum.Truncate())
            .ToDictionary(x => x.Key, x => x.ToList());
     }
 
@@ -180,24 +181,24 @@ public partial class Radar
             foreach (var (vector, _) in tileGroup)
             {
                 var mult = IsGridWalkable(vector) ? 100 : 1;
-                v += mult * vector.ToVector2();
+                v += mult * vector.ToVector2Num();
                 count += mult;
             }
 
             v /= count;
             var replacement = tileGroup.Select(tile => new Vector2i(tile.First.X, tile.First.Y))
                .Where(IsGridWalkable)
-               .OrderBy(x => (x.ToVector2() - v).LengthSquared())
+               .OrderBy(x => (x.ToVector2Num() - v).LengthSquared())
                .Select(x => (Vector2i?)x)
                .FirstOrDefault();
             if (replacement != null)
             {
-                v = replacement.Value.ToVector2();
+                v = replacement.Value.ToVector2Num();
             }
 
             if (!IsGridWalkable(v.Truncate()))
             {
-                v = GetAllNeighborTiles(v.Truncate()).First(IsGridWalkable).ToVector2();
+                v = GetAllNeighborTiles(v.Truncate()).First(IsGridWalkable).ToVector2Num();
             }
 
             resultList.Add(v);
