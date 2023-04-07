@@ -110,14 +110,7 @@ public partial class Radar
 
             if (!Settings.Debug.SkipEdgeDetector)
             {
-                var edgeDetector = new EdgeDetectorProcessor(new EdgeDetectorKernel(new DenseMatrix<float>(new float[,]
-                    {
-                        { -1, -1, -1, -1, -1 },
-                        { -1, -1, -1, -1, -1 },
-                        { -1, -1, 24, -1, -1 },
-                        { -1, -1, -1, -1, -1 },
-                        { -1, -1, -1, -1, -1 },
-                    })), false)
+                var edgeDetector = new EdgeDetectorProcessor(EdgeDetectorKernel.Laplacian5x5, false)
                    .CreatePixelSpecificProcessor(configuration, image, image.Bounds());
                 edgeDetector.Execute();
             }
