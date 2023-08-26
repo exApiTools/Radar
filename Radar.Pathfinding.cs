@@ -130,16 +130,26 @@ public partial class Radar
         var ret = new ConcurrentDictionary<string, ConcurrentQueue<Vector2i>>();
         Parallel.For(0, tileData.Length, tileNumber =>
         {
-            var key = GameController.Memory.Read<TgtDetailStruct>
-            (GameController.Memory.Read<TgtTileStruct>(tileData[tileNumber].TgtFilePtr)
-               .TgtDetailPtr).name.ToString(GameController.Memory);
-            if (string.IsNullOrEmpty(key))
-                return;
-            var stdTuple2D = new Vector2i(
+            var tgtTileStruct = GameController.Memory.Read<TgtTileStruct>(tileData[tileNumber].TgtFilePtr);
+            var key2 = GameController.Memory.Read<TgtDetailStruct>(tgtTileStruct.TgtDetailPtr)
+                .name.ToString(GameController.Memory);
+            var coordinate = new Vector2i(
                 tileNumber % _terrainMetadata.NumCols * TileToGridConversion,
                 tileNumber / _terrainMetadata.NumCols * TileToGridConversion);
 
-            ret.GetOrAdd(key, _ => new ConcurrentQueue<Vector2i>()).Enqueue(stdTuple2D);
+            if (Settings.PathfindingSettings.IncludeTilePathsAsTargets)
+            {
+                var key1 = tgtTileStruct.TgtPath.ToString(GameController.Memory);
+                if (!string.IsNullOrEmpty(key1))
+                {
+                    ret.GetOrAdd(key1, _ => new ConcurrentQueue<Vector2i>()).Enqueue(coordinate);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(key2))
+            {
+                ret.GetOrAdd(key2, _ => new ConcurrentQueue<Vector2i>()).Enqueue(coordinate);
+            }
         });
         return ret.ToDictionary(k => k.Key, k => k.Value.ToList());
     }
@@ -168,10 +178,20 @@ public partial class Radar
         return tileMap;
     }
 
+    private IReadOnlyCollection<Vector2i> GetLocationsFromTilePattern(string tilePattern)
+    {
+        var regex = tilePattern.ToLikeRegex();
+        return _allTargetLocations.Where(x => regex.IsMatch(x.Key)).SelectMany(x => x.Value).ToList();
+    }
+
     private TargetLocations ClusterTarget(TargetDescription target)
     {
-        if (!_allTargetLocations.TryGetValue(target.Name, out var tileList))
+        var tileList = GetLocationsFromTilePattern(target.Name);
+        if (tileList is not { Count: > 0 })
+        {
             return null;
+        }
+
         var clusterIndexes = KMeans.Cluster(tileList.Select(x => new Vector2d(x.X, x.Y)).ToArray(), target.ExpectedCount);
         var resultList = new List<Vector2>();
         foreach (var tileGroup in tileList.Zip(clusterIndexes).GroupBy(x => x.Second))

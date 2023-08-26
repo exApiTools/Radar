@@ -1,6 +1,8 @@
-﻿using ExileCore.Shared.Attributes;
+﻿using ExileCore;
+using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
+using ImGuiNET;
 using Newtonsoft.Json;
 using SharpDX;
 
@@ -16,6 +18,7 @@ public class DebugSettings
     public ToggleNode SkipRecoloring { get; set; } = new ToggleNode(false);
     public ToggleNode DisableDrawRegionLimiting { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
+    public ToggleNode IgnoreLargePanels { get; set; } = new ToggleNode(false);
     public RangeNode<int> MapCenterOffsetX { get; set; } = new RangeNode<int>(0, -1000, 1000);
     public RangeNode<int> MapCenterOffsetY { get; set; } = new RangeNode<int>(0, -1000, 1000);
 }
@@ -35,10 +38,20 @@ public class WorldPathSettings
 [Submenu]
 public class PathfindingSettings
 {
+    [Menu(null, "For debugging only")]
+    [JsonIgnore]
+    public TextNode CurrentZoneName { get; set; } = new TextNode("<unknown>");
+
     public ToggleNode ShowPathsToTargetsOnMap { get; set; } = new ToggleNode(true);
     public ColorNode DefaultMapPathColor { get; set; } = new ColorNode(Color.Green);
     public ToggleNode UseRainbowColorsForMapPaths { get; set; } = new ToggleNode(true);
     public ToggleNode ShowAllTargets { get; set; } = new ToggleNode(false);
+
+    [Menu(null, "Do not show targets that occur more than X times per zone")]
+    [ConditionalDisplay(nameof(ShowAllTargets))]
+    public RangeNode<int> MaxTargetNameCount { get; set; } = new RangeNode<int>(10, 1, 100);
+
+    public ToggleNode IncludeTilePathsAsTargets { get; set; } = new ToggleNode(true);
     public ToggleNode ShowSelectedTargets { get; set; } = new ToggleNode(true);
     public ToggleNode EnableTargetNameBackground { get; set; } = new ToggleNode(true);
     public ColorNode TargetNameColor { get; set; } = new ColorNode(Color.Violet);
