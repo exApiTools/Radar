@@ -4,7 +4,7 @@ using GameOffsets.Native;
 
 namespace Radar;
 
-public class PathFinder
+public class PathFinder : IPathFinder
 {
     private readonly bool[][] _grid;
 
