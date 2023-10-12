@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Radar;
+﻿namespace Radar;
 
 public readonly record struct Vector2d(double X, double Y)
 {

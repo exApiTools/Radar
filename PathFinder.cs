@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using GameOffsets.Native;
 
 namespace Radar;
@@ -62,7 +60,11 @@ public class PathFinder
 
     public IEnumerable<List<Vector2i>> RunFirstScan(Vector2i start, Vector2i target)
     {
-        ExactDistanceField.TryAdd(target, new Dictionary<Vector2i, float>());
+        if (!ExactDistanceField.TryAdd(target, new Dictionary<Vector2i, float>()))
+        {
+            yield break;
+        }
+
         var exactDistanceField = ExactDistanceField[target];
         exactDistanceField[target] = 0;
         var localBacktrackDictionary = new Dictionary<Vector2i, Vector2i>();
@@ -130,7 +132,6 @@ public class PathFinder
         while (current != target)
         {
             var next = GetNeighbors(current).MinBy(x => GetExactDistance(x, exactDistanceField));
-            Debug.Assert(!path.Contains(next));
             path.Add(next);
             current = next;
         }

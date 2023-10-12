@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text.RegularExpressions;
 using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;

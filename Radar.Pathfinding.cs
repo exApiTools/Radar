@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using ExileCore.PoEMemory.Components;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
@@ -17,6 +11,9 @@ namespace Radar;
 
 public partial class Radar
 {
+    private Func<Vector2, Action<List<Vector2i>>, CancellationToken, Task> _addRouteAction;
+    private Func<Color> _getColor;
+
     private void LoadTargets()
     {
         var fileText = File.ReadAllText(Path.Combine(DirectoryFullName, "targets.json"));
@@ -33,8 +30,54 @@ public partial class Radar
     {
         if (Settings.PathfindingSettings.ShowPathsToTargetsOnMap)
         {
-            FindPaths(_clusteredTargetLocations, _routes, _findPathsCts.Token);
+            var e = Enumerable.Repeat(RainbowColors, 100).SelectMany(x => x).GetEnumerator();
+            _getColor = () =>
+            {
+                e.MoveNext();
+                return e.Current;
+            };
+            var pf = new PathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
+            _addRouteAction = (point, callback, cancellationToken) => Task.Run(() => FindPath(pf, point, callback, cancellationToken), cancellationToken);
+            foreach (var location in _clusteredTargetLocations
+                         .SelectMany(x => x.Value.Locations)
+                         .Distinct())
+            {
+                AddRoute(location);
+            }
         }
+    }
+
+    private void AddRoute(Vector2 target)
+    {
+        var color = _getColor();
+
+        Color GetWorldColor() => Settings.PathfindingSettings.WorldPathSettings.UseRainbowColorsForPaths
+            ? color
+            : Settings.PathfindingSettings.WorldPathSettings.DefaultPathColor;
+
+        Color GetMapColor() => Settings.PathfindingSettings.UseRainbowColorsForMapPaths
+            ? color
+            : Settings.PathfindingSettings.DefaultMapPathColor;
+
+        var routes = _routes;
+        AddRoute(target, path =>
+        {
+            if (path != null)
+            {
+                var rd = new RouteDescription { Path = path, MapColor = GetMapColor, WorldColor = GetWorldColor };
+                routes.AddOrUpdate(target, rd, (_, _) => rd);
+            }
+        }, _findPathsCts.Token);
+    }
+
+    private Task AddRoute(Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
+    {
+        if (_addRouteAction == null)
+        {
+            return Task.FromException(new Exception("Pathfinding wasn't started yet"));
+        }
+
+        return _addRouteAction(target, callback, cancellationToken);
     }
 
     private void StopPathFinding()
@@ -42,18 +85,7 @@ public partial class Radar
         _findPathsCts.Cancel();
         _findPathsCts = new CancellationTokenSource();
         _routes = new ConcurrentDictionary<Vector2, RouteDescription>();
-    }
-
-    private void FindPaths(IReadOnlyDictionary<string, TargetLocations> tiles, ConcurrentDictionary<Vector2, RouteDescription> routes, CancellationToken cancellationToken)
-    {
-        var targets = tiles.SelectMany(x => x.Value.Locations)
-           .Distinct()
-           .ToList();
-        var pf = new PathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
-        foreach (var (point, color) in targets.Take(Settings.MaximumPathCount).Zip(Enumerable.Repeat(RainbowColors, 100).SelectMany(x => x)))
-        {
-            Task.Run(() => FindPath(pf, point, color, routes, cancellationToken));
-        }
+        _addRouteAction = null;
     }
 
     private async Task WaitUntilPluginEnabled(CancellationToken cancellationToken)
@@ -64,10 +96,8 @@ public partial class Radar
         }
     }
 
-    private async Task FindPath(PathFinder pf, Vector2 point, Color color, ConcurrentDictionary<Vector2, RouteDescription> routes, CancellationToken cancellationToken)
+    private async Task FindPath(PathFinder pf, Vector2 point, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
     {
-        Color GetWorldColor() => Settings.PathfindingSettings.WorldPathSettings.UseRainbowColorsForPaths ? color : Settings.PathfindingSettings.WorldPathSettings.DefaultPathColor;
-        Color GetMapColor() => Settings.PathfindingSettings.UseRainbowColorsForMapPaths ? color : Settings.PathfindingSettings.DefaultMapPathColor;
         var playerPosition = GetPlayerPosition();
         var pathI = pf.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
         foreach (var elem in pathI)
@@ -80,8 +110,7 @@ public partial class Radar
 
             if (elem.Any())
             {
-                var rd = new RouteDescription { Path = elem, MapColor = GetMapColor, WorldColor = GetWorldColor };
-                routes.AddOrUpdate(point, rd, (_, _) => rd);
+                callback(elem);
             }
         }
 
@@ -102,26 +131,22 @@ public partial class Radar
 
             playerPosition = newPosition;
             var path = pf.FindPath(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
-            if (path != null)
-            {
-                var rd = new RouteDescription { Path = path, MapColor = GetMapColor, WorldColor = GetWorldColor };
-                routes.AddOrUpdate(point, rd, (_, _) => rd);
-            }
+            callback(path);
         }
     }
 
     private ConcurrentDictionary<string, List<Vector2i>> GetTargets()
     {
         return new ConcurrentDictionary<string, List<Vector2i>>(GetTileTargets().Concat(GetEntityTargets())
-           .ToLookup(x => x.Key, x => x.Value)
-           .ToDictionary(x => x.Key, x => x.SelectMany(v => v).ToList()));
+            .ToLookup(x => x.Key, x => x.Value)
+            .ToDictionary(x => x.Key, x => x.SelectMany(v => v).ToList()));
     }
 
     private Dictionary<string, List<Vector2i>> GetEntityTargets()
     {
         return GameController.Entities.Where(x => x.HasComponent<Positioned>()).Where(x => _currentZoneTargetEntityPaths.Contains(x.Path))
-           .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPosNum.Truncate())
-           .ToDictionary(x => x.Key, x => x.ToList());
+            .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPosNum.Truncate())
+            .ToDictionary(x => x.Key, x => x.ToList());
     }
 
     private Dictionary<string, List<Vector2i>> GetTileTargets()
@@ -186,13 +211,26 @@ public partial class Radar
 
     private TargetLocations ClusterTarget(TargetDescription target)
     {
-        var tileList = GetLocationsFromTilePattern(target.Name);
+        var expectedCount = target.ExpectedCount;
+        var targetName = target.Name;
+        var locations = ClusterTarget(targetName, expectedCount);
+        if (locations == null) return null;
+        return new TargetLocations
+        {
+            Locations = locations,
+            DisplayName = target.DisplayName
+        };
+    }
+
+    private Vector2[] ClusterTarget(string targetName, int expectedCount)
+    {
+        var tileList = GetLocationsFromTilePattern(targetName);
         if (tileList is not { Count: > 0 })
         {
             return null;
         }
 
-        var clusterIndexes = KMeans.Cluster(tileList.Select(x => new Vector2d(x.X, x.Y)).ToArray(), target.ExpectedCount);
+        var clusterIndexes = KMeans.Cluster(tileList.Select(x => new Vector2d(x.X, x.Y)).ToArray(), expectedCount);
         var resultList = new List<Vector2>();
         foreach (var tileGroup in tileList.Zip(clusterIndexes).GroupBy(x => x.Second))
         {
@@ -207,10 +245,10 @@ public partial class Radar
 
             v /= count;
             var replacement = tileGroup.Select(tile => new Vector2i(tile.First.X, tile.First.Y))
-               .Where(IsGridWalkable)
-               .OrderBy(x => (x.ToVector2Num() - v).LengthSquared())
-               .Select(x => (Vector2i?)x)
-               .FirstOrDefault();
+                .Where(IsGridWalkable)
+                .OrderBy(x => (x.ToVector2Num() - v).LengthSquared())
+                .Select(x => (Vector2i?)x)
+                .FirstOrDefault();
             if (replacement != null)
             {
                 v = replacement.Value.ToVector2Num();
@@ -224,11 +262,8 @@ public partial class Radar
             resultList.Add(v);
         }
 
-        return new TargetLocations
-        {
-            Locations = resultList.Distinct().ToArray(),
-            DisplayName = target.DisplayName
-        };
+        var locations = resultList.Distinct().ToArray();
+        return locations;
     }
 
     private bool IsGridWalkable(Vector2i tile)
