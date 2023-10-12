@@ -1,5 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ExileCore;
 using ExileCore.PoEMemory.Components;
+using ExileCore.PoEMemory.MemoryObjects.Ancestor;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
@@ -99,7 +108,13 @@ public partial class Radar
     private async Task FindPath(PathFinder pf, Vector2 point, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
     {
         var playerPosition = GetPlayerPosition();
-        var pathI = pf.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
+        Stopwatch sw = Stopwatch.StartNew();
+        var pathI = pf.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y)).ToList();
+        DebugWindow.LogMsg($"Old init: {sw.Elapsed}");
+        var jpsPathFinder = new JpsPathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
+        sw.Restart();
+        var pathI2 = jpsPathFinder.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y)).ToList();
+        DebugWindow.LogMsg($"New init: {sw.Elapsed}");
         foreach (var elem in pathI)
         {
             await WaitUntilPluginEnabled(cancellationToken);
@@ -130,8 +145,13 @@ public partial class Radar
             }
 
             playerPosition = newPosition;
+        sw.Restart();
             var path = pf.FindPath(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
-            callback(path);
+        DebugWindow.LogMsg($"Old ite: {sw.Elapsed} ({path?.Count})");
+        sw.Restart();
+            var path2 = jpsPathFinder.FindPath(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
+        DebugWindow.LogMsg($"New ite: {sw.Elapsed} ({path2?.Count})");
+            callback(path2);
         }
     }
 

@@ -1,4 +1,8 @@
-﻿namespace Radar;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Radar;
 
 public static class KMeans
 {

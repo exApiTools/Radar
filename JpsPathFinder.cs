@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using GameOffsets.Native;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Radar;
 
@@ -22,6 +27,7 @@ public class JpsPathFinder : IPathFinder
     bool IsEmpty(int r, int c) => c >= 0 && r >= 0 && r < _dimension1 && c < _dimension2 && _grid[c][r];
     bool IsWall(int r, int c) => !IsEmpty(r, c);
     bool IsWall(Vector2i v) => IsWall(v.X, v.Y);
+    bool IsEmpty(Vector2i v) => IsEmpty(v.X, v.Y);
 
     bool IsJumpPoint(int r, int c, int rowDir, int colDir)
     {
@@ -31,6 +37,14 @@ public class JpsPathFinder : IPathFinder
               IsWall(r - rowDir + colDir, c - colDir + rowDir)) || // 1st forced neighbor (continued)
              (IsEmpty(r - colDir, c - rowDir) && // 2nd forced neighbor
               IsWall(r - rowDir - colDir, c - colDir - rowDir))); // 2nd forced neighbor (continued)
+    }
+
+    bool IsJumpPoint(Vector2i v, Vector2i d)
+    {
+        var sw = new Vector2i(d.Y, d.X);
+        return IsEmpty(v - d) &&
+               ((IsEmpty(v + sw) && IsWall(v - d + sw)) ||
+                (IsEmpty(v - sw) && IsWall(v - d - sw)));
     }
 
     private struct CardinalDirections
@@ -139,14 +153,14 @@ public class JpsPathFinder : IPathFinder
 
     private static readonly Dictionary<Vector2i, List<Vector2i>> DirectionMap = new()
     {
-        [new Vector2i(0, 1)] = new() { new(0, 1), new(1, 0), new(-1, 0), new(1, 1), new(-1, 1) },
-        [new Vector2i(0, -1)] = new() { new(0, -1), new(1, 0), new(-1, 0), new(1, -1), new(-1, -1) },
-        [new Vector2i(1, 0)] = new() { new(1, 0), new(0, 1), new(0, -1), new(1, 1), new(1, -1) },
-        [new Vector2i(-1, 0)] = new() { new(-1, 0), new(0, 1), new(0, -1), new(-1, 1), new(-1, -1) },
-        [new Vector2i(1, 1)] = new() { new(1, 1), new(1, 0), new(0, 1) },
-        [new Vector2i(-1, 1)] = new() { new(-1, 1), new(-1, 0), new(0, 1) },
-        [new Vector2i(-1, -1)] = new() { new(-1, -1), new(-1, 0), new(0, -1) },
-        [new Vector2i(1, -1)] = new() { new(1, -1), new(1, 0), new(0, -1) },
+        [new Vector2i(0, 1)] = new() { new(0, 1), new(1, 1), new(-1, 1) },
+        [new Vector2i(0, -1)] = new() { new(0, -1), new(1, -1), new(-1, -1) },
+        [new Vector2i(1, 0)] = new() { new(1, 0), new(1, 1), new(1, -1) },
+        [new Vector2i(-1, 0)] = new() { new(-1, 0), new(-1, 1), new(-1, -1) },
+        [new Vector2i(1, 1)] = new() { new(1, 1), new(1, 0), new(0, 1), new(-1, 1), new(1, -1) },
+        [new Vector2i(-1, 1)] = new() { new(-1, 1), new(-1, 0), new(0, 1), new(1, 1), new(-1, -1) },
+        [new Vector2i(-1, -1)] = new() { new(-1, -1), new(-1, 0), new(0, -1), new(1, -1), new(-1, 1) },
+        [new Vector2i(1, -1)] = new() { new(1, -1), new(1, 0), new(0, -1), new(1, 1), new(-1, -1), },
         [new Vector2i(0, 0)] = new() { new(0, 1), new(1, 1), new(1, 0), new(1, -1), new(0, -1), new(-1, -1), new(-1, 0), new(-1, 1) },
     };
 
@@ -236,6 +250,11 @@ public class JpsPathFinder : IPathFinder
                 {
                     successor = coord + newDirection * jumpPointDistance;
                 }
+                //else
+                //if (jumpPointDistance != 0)
+                //{
+                //    successor = coord + newDirection;
+                //}
 
                 if (successor != null && localBacktrackDictionary.TryAdd(successor.Value, coord))
                 {
@@ -254,7 +273,7 @@ public class JpsPathFinder : IPathFinder
         var xDiff = Math.Abs(a.X - b.X);
         var yDiff = Math.Abs(a.Y - b.Y);
         var (min, max) = xDiff < yDiff ? (xDiff, yDiff) : (yDiff, xDiff);
-        return min + (max - min) * sqrt2;
+        return max - min + min * sqrt2;
     }
 
     private AllDirections[][] GetDistanceField()
@@ -307,16 +326,43 @@ public class JpsPathFinder : IPathFinder
             for (int y = 0; y < _dimension2; ++y)
             {
                 ProcessDiagonal(x, y, new Vector2i(-1, -1), distance);
-                ProcessDiagonal(x, y, new Vector2i(1, -1), distance);
             }
 
             for (int y = _dimension2 - 1; y >= 0; --y)
             {
                 ProcessDiagonal(x, y, new Vector2i(-1, 1), distance);
+            }
+        }
+
+        for (int x = _dimension1 - 1; x >= 0; --x)
+        {
+            for (int y = 0; y < _dimension2; ++y)
+            {
+                ProcessDiagonal(x, y, new Vector2i(1, -1), distance);
+            }
+
+            for (int y = _dimension2 - 1; y >= 0; --y)
+            {
                 ProcessDiagonal(x, y, new Vector2i(1, 1), distance);
             }
         }
 
+        var configuration = Configuration.Default.Clone();
+        configuration.PreferContiguousImageBuffers = true;
+        using var image = new Image<Rgba32>(configuration, _dimension1, _dimension2);
+        image.Mutate(i => i.ProcessPixelRowsAsVector4((r, i) =>
+        {
+            Span<AllDirections> d = stackalloc AllDirections[1];
+            for (int j = 0; j < r.Length; j++)
+            {
+                var z = distance[j][i.Y];
+                d[0] = z;
+                var fs = MemoryMarshal.Cast<AllDirections, int>(d).ToArray();
+                var min = fs.Where(x => x > 0).DefaultIfEmpty(0).Min();
+                r[j] = IsWall(j, i.Y) ? new Vector4(0, 0, 1, 1) : new Vector4(min == 0 ? 1 : 0, 1f / min, 0, 1);
+            }
+        }));
+        image.SaveAsBmp($"{Guid.NewGuid()}.bmp");
         return distance;
     }
 
@@ -325,19 +371,13 @@ public class JpsPathFinder : IPathFinder
         var coord = new Vector2i(x, y);
         if (IsWall(coord)) return;
         var (v1, v2) = Split(direction);
-        if (
-            //IsWall(coord + v1) ||
-            //IsWall(coord + v2) ||
-            IsWall(coord + direction))
+        if (IsWall(coord + direction))
         {
             //Wall one away
             Set(ref distance[x][y], direction, 0);
         }
-        else if (
-            //!IsWall(coord + v1) &&
-            //     !IsWall(coord + v2) &&
-                 (Extract(distance[x + direction.X][y + direction.Y], v1) > 0 ||
-                  Extract(distance[x + direction.X][y + direction.Y], v2) > 0))
+        else if (Extract(distance[x + direction.X][y + direction.Y], v1) > 0 ||
+                 Extract(distance[x + direction.X][y + direction.Y], v2) > 0)
         {
             //Straight jump point one away
             Set(ref distance[x][y], direction, 1);
@@ -357,7 +397,7 @@ public class JpsPathFinder : IPathFinder
         }
     }
 
-    private (Vector2i, Vector2i) Split(Vector2i v)
+    private static (Vector2i, Vector2i) Split(Vector2i v)
     {
         return (new Vector2i(0, v.Y), new Vector2i(v.X, 0));
     }
@@ -366,10 +406,9 @@ public class JpsPathFinder : IPathFinder
     {
         if (IsWall(x, y))
         {
-            count = -1;
             jumpPointLastSeen = false;
             Set(ref distance[x][y], direction, 0);
-            return count;
+            return -1;
         }
 
         count++;
@@ -394,30 +433,35 @@ public class JpsPathFinder : IPathFinder
     private CardinalDirections[][] GetJumpPoints()
     {
         var jp = Enumerable.Repeat(0, _dimension1).Select(_ => Enumerable.Repeat(0, _dimension2).Select(_ => new CardinalDirections()).ToArray()).ToArray();
+        var v1 = new Vector2i(1, 0);
+        var v2 = new Vector2i(-1, 0);
+        var v3 = new Vector2i(0, 1);
+        var v4 = new Vector2i(0, -1);
         for (int x = 0; x < _dimension1; ++x)
         {
             for (int y = 0; y < _dimension2; ++y)
             {
-                if (IsEmpty(x, y))
+                var v = new Vector2i(x, y);
+                if (IsEmpty(v))
                 {
-                    if (IsJumpPoint(x, y, 1, 0))
+                    if (IsJumpPoint(v, v1))
                     {
-                        Set(ref jp[x][y], new Vector2i(1, 0), true);
+                        Set(ref jp[x][y], v1, true);
                     }
 
-                    if (IsJumpPoint(x, y, -1, 0))
+                    if (IsJumpPoint(v, v2))
                     {
-                        Set(ref jp[x][y], new Vector2i(-1, 0), true);
+                        Set(ref jp[x][y], v2, true);
                     }
 
-                    if (IsJumpPoint(x, y, 0, 1))
+                    if (IsJumpPoint(v, v3))
                     {
-                        Set(ref jp[x][y], new Vector2i(0, 1), true);
+                        Set(ref jp[x][y], v3, true);
                     }
 
-                    if (IsJumpPoint(x, y, 0, -1))
+                    if (IsJumpPoint(v, v4))
                     {
-                        Set(ref jp[x][y], new Vector2i(0, -1), true);
+                        Set(ref jp[x][y], v4, true);
                     }
                 }
             }

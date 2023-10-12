@@ -1,4 +1,6 @@
-﻿namespace Radar;
+﻿using System.Collections.Generic;
+
+namespace Radar;
 
 public class BinaryHeap<TKey, TValue>
 {
