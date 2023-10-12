@@ -44,6 +44,17 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private ImDrawListPtr _backGroundWindowPtr;
     private ConcurrentDictionary<Vector2, RouteDescription> _routes = new();
 
+    public override bool Initialise()
+    {
+        GameController.PluginBridge.SaveMethod("Radar.LookForRoute",
+            (Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken) =>
+                AddRoute(target, callback, cancellationToken));
+        GameController.PluginBridge.SaveMethod("Radar.ClusterTarget",
+            (string targetName, int expectedCount) => ClusterTarget(targetName, expectedCount));
+
+        return true;
+    }
+
     public override void AreaChange(AreaInstance area)
     {
         StopPathFinding();
@@ -127,10 +138,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                     var newValue = _clusteredTargetLocations.AddOrUpdate(path,
                         _ => ClusterTarget(_targetDescriptionsInArea[path]),
                         (_, _) => ClusterTarget(_targetDescriptionsInArea[path]));
-                    //restarting PF is a VERY expensive option, so spare some cycles to check we actually need it
-                    if (oldValue == null || !newValue.Locations.ToHashSet().SetEquals(oldValue.Locations))
+                    foreach (var newLocation in newValue.Locations.Except(oldValue.Locations ?? Array.Empty<Vector2>()))
                     {
-                        RestartPathFinding();
+                        AddRoute(newLocation);
                     }
                 }
             }
@@ -194,7 +204,8 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         var largeMap = map.LargeMap.AsObject<SubMap>();
         if (largeMap.IsVisible)
         {
-            var mapCenter = largeMap.GetClientRect().TopLeft.ToVector2Num() + largeMap.ShiftNum + largeMap.DefaultShiftNum + new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
+            var mapCenter = largeMap.GetClientRect().TopLeft.ToVector2Num() + largeMap.ShiftNum + largeMap.DefaultShiftNum +
+                            new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
             //I have ABSOLUTELY NO IDEA where 677 comes from, but it works perfectly in all configurations I was able to test. Aspect ratio doesn't matter, just camera height
             _mapScale = GameController.IngameState.Camera.Height / 677f * largeMap.Zoom * Settings.CustomScale;
             DrawLargeMap(mapCenter);
@@ -216,8 +227,8 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 return;
             var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.PosNum with { Z = playerRender.RenderStruct.Height });
             foreach (var (route, offsetAmount) in _routes.Values
-                        .GroupBy(x => x.Path.Count < 2 ? 0 : (x.Path[1] - x.Path[0]) switch { var diff => Math.Atan2(diff.Y, diff.X) })
-                        .SelectMany(group => group.Select((route, i) => (route, i - group.Count() / 2.0f + 0.5f))))
+                         .GroupBy(x => x.Path.Count < 2 ? 0 : (x.Path[1] - x.Path[0]) switch { var diff => Math.Atan2(diff.Y, diff.X) })
+                         .SelectMany(group => group.Select((route, i) => (route, i - group.Count() / 2.0f + 0.5f))))
             {
                 var p0 = initPos;
                 var p0WithOffset = p0;
@@ -227,8 +238,8 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                     var p1 = GameController.IngameState.Camera.WorldToScreen(
                         new Vector3(elem.X * GridToWorldMultiplier, elem.Y * GridToWorldMultiplier, _heightData[elem.Y][elem.X]));
                     var offsetDirection = Settings.PathfindingSettings.WorldPathSettings.OffsetPaths
-                                              ? (p1 - p0) switch { var s => new Vector2(s.Y, -s.X) / s.Length() }
-                                              : Vector2.Zero;
+                        ? (p1 - p0) switch { var s => new Vector2(s.Y, -s.X) / s.Length() }
+                        : Vector2.Zero;
                     var finalOffset = offsetDirection * offsetAmount * Settings.PathfindingSettings.WorldPathSettings.PathThickness;
                     p0 = p1;
                     p1 += finalOffset;
@@ -301,7 +312,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 ithElement %= 5;
                 foreach (var elem in route.Path.Skip(ithElement).GetEveryNth(5))
                 {
-                    var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight +_heightData[elem.Y][elem.X]);
+                    var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight + _heightData[elem.Y][elem.X]);
                     DrawBox(mapCenter + mapDelta - new Vector2(2, 2), mapCenter + mapDelta + new Vector2(2, 2), route.MapColor());
                 }
             }
