@@ -40,6 +40,10 @@ public class PathfindingSettings
     [JsonIgnore]
     public TextNode CurrentZoneName { get; set; } = new TextNode("<unknown>");
 
+    [Menu(null, "For debugging only")]
+    [JsonIgnore]
+    public TextNode TargetNameFilter { get; set; } = new TextNode("");
+
     public ToggleNode ShowPathsToTargetsOnMap { get; set; } = new ToggleNode(true);
     public ColorNode DefaultMapPathColor { get; set; } = new ColorNode(Color.Green);
     public ToggleNode UseRainbowColorsForMapPaths { get; set; } = new ToggleNode(true);

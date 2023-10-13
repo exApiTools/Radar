@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text.RegularExpressions;
 using System.Threading;
 using ExileCore;
 using ExileCore.PoEMemory.Elements;
@@ -322,8 +323,15 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         {
             foreach (var (location, texts) in _locationsByPosition)
             {
-                var text = string.Join("\n",
-                    texts.Distinct().Where(t => _allTargetLocations.GetValueOrDefault(t) is { } list && list.Count <= Settings.PathfindingSettings.MaxTargetNameCount));
+                var regex = string.IsNullOrEmpty(Settings.PathfindingSettings.TargetNameFilter)
+                    ? null
+                    : new Regex(Settings.PathfindingSettings.TargetNameFilter);
+
+                bool TargetFilter(string t) =>
+                    (regex?.IsMatch(t) ?? true) &&
+                    _allTargetLocations.GetValueOrDefault(t) is { } list && list.Count <= Settings.PathfindingSettings.MaxTargetNameCount;
+
+                var text = string.Join("\n", texts.Distinct().Where(TargetFilter));
                 var textOffset = Graphics.MeasureText(text) / 2f;
                 var mapDelta = TranslateGridDeltaToMapDelta(location.ToVector2Num() - playerPosition, playerHeight + _heightData[location.Y][location.X]);
                 var mapPos = mapCenter + mapDelta;

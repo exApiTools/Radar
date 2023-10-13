@@ -105,8 +105,7 @@ public partial class Radar
     private async Task FindPath(PathFinder pf, Vector2 point, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
     {
         var playerPosition = GetPlayerPosition();
-        var pathI = pf.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y));
-        foreach (var elem in pathI)
+        foreach (var elem in pf.RunFirstScan(new Vector2i((int)playerPosition.X, (int)playerPosition.Y), new Vector2i((int)point.X, (int)point.Y)))
         {
             await WaitUntilPluginEnabled(cancellationToken);
             if (cancellationToken.IsCancellationRequested)

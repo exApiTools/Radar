@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using GameOffsets.Native;
 
 namespace Radar;
@@ -12,6 +13,7 @@ public class PathFinder
 
     //target->current->next
     private readonly ConcurrentDictionary<Vector2i, Dictionary<Vector2i, float>> ExactDistanceField = new();
+    private readonly ConcurrentDictionary<Vector2i, byte[][]> DirectionField = new();
     private readonly int _dimension2;
     private readonly int _dimension1;
 
@@ -38,7 +40,7 @@ public class PathFinder
         return _grid[tile.Y][tile.X];
     }
 
-    private static readonly IReadOnlyList<Vector2i> NeighborOffsets = new List<Vector2i>
+    private static readonly List<Vector2i> NeighborOffsets = new List<Vector2i>
     {
         new Vector2i(0, 1),
         new Vector2i(1, 1),
@@ -62,6 +64,11 @@ public class PathFinder
 
     public IEnumerable<List<Vector2i>> RunFirstScan(Vector2i start, Vector2i target)
     {
+        if (DirectionField.ContainsKey(target))
+        {
+            yield break;
+        }
+
         if (!ExactDistanceField.TryAdd(target, new Dictionary<Vector2i, float>()))
         {
             yield break;
@@ -123,21 +130,74 @@ public class PathFinder
                 sw.Restart();
             }
         }
+
+        localBacktrackDictionary.Clear();
+
+        if (_dimension1 * _dimension2 < exactDistanceField.Count * (sizeof(int) * 2 + Unsafe.SizeOf<Vector2i>() + Unsafe.SizeOf<float>()))
+        {
+            var directionGrid = _grid
+                .AsParallel().AsOrdered().Select((r, y) => r.Select((_, x) =>
+                {
+                    var coordVec = new Vector2i(x, y);
+                    if (float.IsPositiveInfinity(GetExactDistance(coordVec, exactDistanceField)))
+                    {
+                        return (byte)0;
+                    }
+
+                    var neighbors = GetNeighbors(coordVec);
+                    var (closestNeighbor, clndistance) = neighbors.Select(n => (n, distance: GetExactDistance(n, exactDistanceField))).MinBy(p => p.distance);
+                    if (float.IsPositiveInfinity(clndistance))
+                    {
+                        return (byte)0;
+                    }
+
+                    var bestDirection = closestNeighbor - coordVec;
+                    return (byte)(1 + NeighborOffsets.IndexOf(bestDirection));
+                }).ToArray())
+                .ToArray();
+
+            DirectionField[target] = directionGrid;
+            ExactDistanceField.TryRemove(target, out _);
+        }
     }
 
     public List<Vector2i> FindPath(Vector2i start, Vector2i target)
     {
-        var exactDistanceField = ExactDistanceField[target];
-        if (float.IsPositiveInfinity(GetExactDistance(start, exactDistanceField))) return null;
-        var path = new List<Vector2i>();
-        var current = start;
-        while (current != target)
+        if (DirectionField.GetValueOrDefault(target) is { } directionField)
         {
-            var next = GetNeighbors(current).MinBy(x => GetExactDistance(x, exactDistanceField));
-            path.Add(next);
-            current = next;
-        }
+            if (directionField[start.Y][start.X] == 0)
+                return null;
+            var path = new List<Vector2i>();
+            var current = start;
+            while (current != target)
+            {
+                var directionIndex = directionField[current.Y][current.X];
+                if (directionIndex == 0)
+                {
+                    return null;
+                }
 
-        return path;
+                var next = NeighborOffsets[directionIndex - 1] + current;
+                path.Add(next);
+                current = next;
+            }
+
+            return path;
+        }
+        else
+        {
+            var exactDistanceField = ExactDistanceField[target];
+            if (float.IsPositiveInfinity(GetExactDistance(start, exactDistanceField))) return null;
+            var path = new List<Vector2i>();
+            var current = start;
+            while (current != target)
+            {
+                var next = GetNeighbors(current).MinBy(x => GetExactDistance(x, exactDistanceField));
+                path.Add(next);
+                current = next;
+            }
+
+            return path;
+        }
     }
 }
