@@ -4,6 +4,31 @@
       "Name": "waypoint",
       "ExpectedCount": 1,
       "DisplayName": "Waypoint"
+    },
+    {
+      "Name": "npc1",
+      "ExpectedCount": 1,
+      "DisplayName": "Breaker of Oaths - Warlock (Wild/Purple)"
+    },
+    {
+      "Name": "npc2",
+      "ExpectedCount": 1,
+      "DisplayName": "The Warden of Eaves - Maji (Vivid/Yellow)"
+    },
+    {
+      "Name": "npc3",
+      "ExpectedCount": 1,
+      "DisplayName": "The Primal Huntress - Primalist (Primal/Blue)"
+    },
+    {
+      "Name": "sticksinmud",
+      "ExpectedCount": 1,
+      "DisplayName": "Grisly Trophy - Body Loot"
+    },
+    {
+      "Name": "boneyard",
+      "ExpectedCount": 1,
+      "DisplayName": "Boneyard - 50/50 monsters and loot"
     }
   ],
   "2_6_2": [
