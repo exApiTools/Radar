@@ -34,6 +34,16 @@
       "Name": "stonehenge",
       "ExpectedCount": 1,
       "DisplayName": "Stonehenge [Vivid/Yellow]"
+    },
+    {
+      "Name": "witchorb",
+      "ExpectedCount": 1,
+      "DisplayName": "3rd Maji Quest"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Woods/AzmeriLeague/Features/arenaTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Boss stronghold"
     }
   ],
   "2_6_2": [
