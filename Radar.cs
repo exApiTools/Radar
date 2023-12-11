@@ -36,7 +36,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private float[][] _heightData;
     private int[][] _processedTerrainData;
     private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
-    private HashSet<string> _currentZoneTargetEntityPaths = new();
+    private List<(Regex, TargetDescription x)> _currentZoneTargetEntityPaths = new();
     private CancellationTokenSource _findPathsCts = new CancellationTokenSource();
     private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
     private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
@@ -49,7 +49,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     {
         GameController.PluginBridge.SaveMethod("Radar.LookForRoute",
             (Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken) =>
-                AddRoute(target, callback, cancellationToken));
+                AddRoute(target, null, callback, cancellationToken));
         GameController.PluginBridge.SaveMethod("Radar.ClusterTarget",
             (string targetName, int expectedCount) => ClusterTarget(targetName, expectedCount));
 
@@ -62,7 +62,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         if (GameController.Game.IsInGameState || GameController.Game.IsEscapeState)
         {
             _targetDescriptionsInArea = GetTargetDescriptionsInArea().ToDictionary(x => x.Name);
-            _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).Select(x => x.Name).ToHashSet();
+            _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).DistinctBy(x => x.Name).Select(x=>(x.Name.ToLikeRegex(), x)).ToList();
             _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
             _heightData = GameController.IngameState.Data.RawTerrainHeightData;
             _allTargetLocations = GetTargets();
@@ -124,24 +124,24 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         if (positioned != null)
         {
             var path = entity.Path;
-            if (_currentZoneTargetEntityPaths.Contains(path))
+            if (_currentZoneTargetEntityPaths.FirstOrDefault(x=>x.Item1.IsMatch(path)).x is {} targetDescription)
             {
                 bool alreadyContains = false;
                 var truncatedPos = positioned.GridPosNum.Truncate();
-                _allTargetLocations.AddOrUpdate(path, _ => new List<Vector2i> { truncatedPos },
+                _allTargetLocations.AddOrUpdate(targetDescription.Name, _ => [truncatedPos],
                     // ReSharper disable once AssignmentInConditionalExpression
-                    (_, l) => (alreadyContains = l.Contains(truncatedPos)) ? l : l.Append(truncatedPos).ToList());
-                _locationsByPosition.AddOrUpdate(truncatedPos, _ => new List<string> { path },
-                    (_, l) => l.Contains(path) ? l : l.Append(path).ToList());
+                    (_, l) => (alreadyContains = l.Contains(truncatedPos)) ? l : [..l, truncatedPos]);
+                _locationsByPosition.AddOrUpdate(truncatedPos, _ => [targetDescription.Name],
+                    (_, l) => l.Contains(targetDescription.Name) ? l : [..l, targetDescription.Name]);
                 if (!alreadyContains)
                 {
-                    var oldValue = _clusteredTargetLocations.GetValueOrDefault(path);
-                    var newValue = _clusteredTargetLocations.AddOrUpdate(path,
-                        _ => ClusterTarget(_targetDescriptionsInArea[path]),
-                        (_, _) => ClusterTarget(_targetDescriptionsInArea[path]));
-                    foreach (var newLocation in newValue.Locations.Except(oldValue.Locations ?? Array.Empty<Vector2>()))
+                    var oldValue = _clusteredTargetLocations.GetValueOrDefault(targetDescription.Name);
+                    var newValue = _clusteredTargetLocations.AddOrUpdate(targetDescription.Name,
+                        _ => ClusterTarget(_targetDescriptionsInArea[targetDescription.Name]),
+                        (_, _) => ClusterTarget(_targetDescriptionsInArea[targetDescription.Name]));
+                    foreach (var newLocation in newValue.Locations.Except(oldValue?.Locations ?? []))
                     {
-                        AddRoute(newLocation);
+                        AddRoute(newLocation, targetDescription, entity);
                     }
                 }
             }
@@ -342,14 +342,14 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         }
         else if (Settings.PathfindingSettings.ShowSelectedTargets)
         {
-            foreach (var (name, description) in _clusteredTargetLocations)
+            foreach (var (_, description) in _clusteredTargetLocations)
             {
                 foreach (var clusterPosition in description.Locations)
                 {
                     float clusterHeight = 0;
                     if (clusterPosition.X < _heightData[0].Length && clusterPosition.Y < _heightData.Length)
                         clusterHeight = _heightData[(int)clusterPosition.Y][(int)clusterPosition.X];
-                    var text = string.IsNullOrWhiteSpace(description.DisplayName) ? name : description.DisplayName;
+                    var text = description.DisplayName;
                     var textOffset = Graphics.MeasureText(text) / 2f;
                     var mapDelta = TranslateGridDeltaToMapDelta(clusterPosition - playerPosition, playerHeight + clusterHeight);
                     var mapPos = mapCenter + mapDelta;

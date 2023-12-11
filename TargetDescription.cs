@@ -1,6 +1,6 @@
 ﻿namespace Radar;
 
-public class TargetDescription
+public record TargetDescription
 {
     public string Name { get; set; } = "";
     public string DisplayName { get; set; }

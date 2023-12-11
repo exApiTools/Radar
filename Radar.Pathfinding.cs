@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExileCore.PoEMemory.Components;
+using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
@@ -44,16 +45,16 @@ public partial class Radar
             };
             var pf = new PathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
             _addRouteAction = (point, callback, cancellationToken) => Task.Run(() => FindPath(pf, point, callback, cancellationToken), cancellationToken);
-            foreach (var location in _clusteredTargetLocations
-                         .SelectMany(x => x.Value.Locations)
-                         .Distinct())
+            foreach (var (location, target) in _clusteredTargetLocations
+                         .SelectMany(x => x.Value.Locations.Select(loc=>(loc, x.Value.Target)))
+                         .DistinctBy(x => x.loc))
             {
-                AddRoute(location);
+                AddRoute(location, target, null);
             }
         }
     }
 
-    private void AddRoute(Vector2 target)
+    private void AddRoute(Vector2 target, TargetDescription targetDescription, Entity entity)
     {
         var color = _getColor();
 
@@ -66,17 +67,38 @@ public partial class Radar
             : Settings.PathfindingSettings.DefaultMapPathColor;
 
         var routes = _routes;
-        AddRoute(target, path =>
+
+        var cancellationToken = _findPathsCts.Token;
+        if (targetDescription.TargetType == TargetType.Entity && entity != null)
+        {
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cancellationToken = cts.Token;
+
+            async Task CheckEntity()
+            {
+                while (entity.IsValid && entity.GetComponent<Chest>()?.IsOpened != true)
+                {
+                    await Task.Delay(100, cancellationToken);
+                }
+
+                await cts.CancelAsync();
+                routes.Remove(target, out _);
+            }
+
+            _ = CheckEntity();
+        }
+
+        AddRoute(target, targetDescription, path =>
         {
             if (path != null)
             {
                 var rd = new RouteDescription { Path = path, MapColor = GetMapColor, WorldColor = GetWorldColor };
                 routes.AddOrUpdate(target, rd, (_, _) => rd);
             }
-        }, _findPathsCts.Token);
+        }, cancellationToken);
     }
 
-    private Task AddRoute(Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
+    private Task AddRoute(Vector2 target, TargetDescription targetDescription, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
     {
         if (_addRouteAction == null)
         {
@@ -142,17 +164,17 @@ public partial class Radar
 
     private ConcurrentDictionary<string, List<Vector2i>> GetTargets()
     {
-        return new ConcurrentDictionary<string, List<Vector2i>>(GetTileTargets().Concat(GetEntityTargets())
+        return new ConcurrentDictionary<string, List<Vector2i>>(GetTileTargets()
             .ToLookup(x => x.Key, x => x.Value)
             .ToDictionary(x => x.Key, x => x.SelectMany(v => v).ToList()));
     }
 
-    private Dictionary<string, List<Vector2i>> GetEntityTargets()
-    {
-        return GameController.Entities.Where(x => x.HasComponent<Positioned>()).Where(x => _currentZoneTargetEntityPaths.Contains(x.Path))
-            .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPosNum.Truncate())
-            .ToDictionary(x => x.Key, x => x.ToList());
-    }
+    //private Dictionary<string, List<Vector2i>> GetEntityTargets()
+    //{
+    //    return GameController.Entities.Where(x => x.HasComponent<Positioned>()).Where(x => _currentZoneTargetEntityPaths.ContainsKey(x.Path))
+    //        .ToLookup(x => x.Path, x => x.GetComponent<Positioned>().GridPosNum.Truncate())
+    //        .ToDictionary(x => x.Key, x => x.ToList());
+    //}
 
     private Dictionary<string, List<Vector2i>> GetTileTargets()
     {
@@ -223,7 +245,7 @@ public partial class Radar
         return new TargetLocations
         {
             Locations = locations,
-            DisplayName = target.DisplayName
+            Target = target,
         };
     }
 
