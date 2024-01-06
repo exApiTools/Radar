@@ -205,10 +205,8 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         var largeMap = map.LargeMap.AsObject<SubMap>();
         if (largeMap.IsVisible)
         {
-            var mapCenter = largeMap.GetClientRect().TopLeft.ToVector2Num() + largeMap.ShiftNum + largeMap.DefaultShiftNum +
-                            new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
-            //I have ABSOLUTELY NO IDEA where 677 comes from, but it works perfectly in all configurations I was able to test. Aspect ratio doesn't matter, just camera height
-            _mapScale = GameController.IngameState.Camera.Height / 677f * largeMap.Zoom * Settings.CustomScale;
+            var mapCenter = largeMap.MapCenter + new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
+            _mapScale = largeMap.MapScale * Settings.CustomScale;
             DrawLargeMap(mapCenter);
             DrawTargets(mapCenter);
         }
