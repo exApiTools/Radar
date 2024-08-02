@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,7 +12,7 @@ using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
 using Newtonsoft.Json;
-using SharpDX;
+using Color = SharpDX.Color;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Radar;
@@ -92,7 +93,19 @@ public partial class Radar
         {
             if (path != null)
             {
-                var rd = new RouteDescription { Path = path, MapColor = GetMapColor, WorldColor = GetWorldColor };
+                Func<Color> customColorFunc = null;
+                if (targetDescription.Color != null)
+                {
+                    var color = Color.FromAbgr(uint.Parse(targetDescription.Color, NumberStyles.HexNumber));
+                    customColorFunc = () => color;
+                }
+
+                var rd = new RouteDescription
+                {
+                    Path = path, 
+                    MapColor = customColorFunc ?? GetMapColor,
+                    WorldColor = customColorFunc ?? GetWorldColor
+                };
                 routes.AddOrUpdate(target, rd, (_, _) => rd);
             }
         }, cancellationToken);
