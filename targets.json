@@ -177,6 +177,11 @@
       "Name": "entrancedown",
       "ExpectedCount": 2,
       "DisplayName": "Area Transition"
+    },
+    {
+      "Name": "Metadata/Terrain/Prison/Hidden/hidden_prison_SecretWall_OpenAnimation_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Flask Strongbox"
     }
   ],
   "1_1_8": [
@@ -317,6 +322,11 @@
       "Name": "entrance",
       "ExpectedCount": 1,
       "DisplayName": "The Crypt Level 1"
+    },
+    {
+      "Name": "Metadata/Terrain/Leagues/Sanctum/Foyer/Tiles/reaper_entrance.tdt",
+      "ExpectedCount": 3,
+      "DisplayName": "Statue"
     }
   ],
   "1_2_5_1": [
@@ -375,6 +385,11 @@
       "Name": "questcart",
       "ExpectedCount": 1,
       "DisplayName": "Fidelitas"
+    },
+    {
+      "Name": "pit",
+      "ExpectedCount": 1,
+      "DisplayName": "Gems"
     }
   ],
   "1_2_4": [
@@ -503,6 +518,11 @@
       "Name": "exitdown",
       "ExpectedCount": 1,
       "DisplayName": "The Northern Forest"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Features/dungeon_inca_exit_boss_v01_01.tdt",
+      "ExpectedCount": 2,
+      "DisplayName": "Transition"
     },
     {
       "Name": "stairsup",
@@ -1086,6 +1106,13 @@
       "DisplayName": "The Ruined Square"
     }
   ],
+  "1_5_7": [
+    {
+      "Name": "Metadata/Terrain/Theopolis/Reliquary/Feature/Reliquary_Oriath_transition_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ruined Square"
+    }
+  ],
   "1_5_8": [
     {
       "Name": "arena",
@@ -1634,6 +1661,11 @@
       "Name": "entranceslums",
       "ExpectedCount": 1,
       "DisplayName": "Skillpoint"
+    },
+    {
+      "Name": "Metadata/Terrain/RuinedCity/AreaTransitions_Part2/slum_sewer_entrance_warehouse.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Hidden Underbelly"
     }
   ],
   "2_8_10": [
@@ -1653,6 +1685,11 @@
       "Name": "templeentrance",
       "ExpectedCount": 2,
       "DisplayName": "Exit"
+    },
+    {
+      "Name": "forcedblank",
+      "ExpectedCount": 1,
+      "DisplayName": "Pressure Plate"
     },
     {
       "Name": "stairsdown",
@@ -1682,6 +1719,11 @@
       "Name": "battlefront_harbor",
       "ExpectedCount": 1,
       "DisplayName": "The Harbour Bridge"
+    },
+    {
+      "Name": "hidden_tunnel",
+      "ExpectedCount": 1,
+      "DisplayName": "The Hidden Underbelly"
     }
   ],
   "2_8_13": [
@@ -1733,6 +1775,11 @@
       "Name": "lava",
       "ExpectedCount": 1,
       "DisplayName": "Trial of Ascendency"
+    },
+    {
+      "Name": "hidden_tunnel",
+      "ExpectedCount": 1,
+      "DisplayName": "The Hidden Underbelly"
     }
   ],
   "2_8_3": [
@@ -1740,6 +1787,11 @@
       "Name": "aresenal",
       "ExpectedCount": 1,
       "DisplayName": "The Bath House"
+    },
+    {
+      "Name": "Metadata/Terrain/RuinedCity/LargeWall/battlefield_arch_v01_03.tdt",
+      "ExpectedCount": 2,
+      "DisplayName": "Transition"
     },
     {
       "Name": "ladder",
@@ -1761,6 +1813,11 @@
       "DisplayName": "The Lunaris Concourse"
     },
     {
+      "Name": "Metadata/Terrain/Temple/Stairs/templeclean_stairs_convex_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Pressure Plate"
+    },
+    {
       "Name": "stairsdown",
       "ExpectedCount": 1,
       "DisplayName": "The Lunaris Temple Level 2"
@@ -1776,6 +1833,18 @@
       "Name": "roundtopcenter",
       "ExpectedCount": 1,
       "DisplayName": "Lunaris Arena"
+    }
+  ],
+  "2_8_14": [
+    {
+      "Name": "sewerentrance",
+      "ExpectedCount": 1,
+      "DisplayName": "The Grain Gate"
+    },
+    {
+      "Name": "Metadata/Terrain/RuinedCity/Sewers/Features/sewerwall_end_tunnel_v01_03.tdt",
+      "ExpectedCount": 2,
+      "DisplayName": "The Solaris Concourse / The Bath House"
     }
   ],
   "2_9_1": [
@@ -1909,6 +1978,11 @@
       "Name": "entry_main",
       "ExpectedCount": 1,
       "DisplayName": "The Quarry"
+    },
+    {
+      "Name": "hidden_tunnel",
+      "ExpectedCount": 1,
+      "DisplayName": "Refinery Tunnels"
     },
     {
       "Name": "boss_transition",
