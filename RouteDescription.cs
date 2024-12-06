@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameOffsets.Native;
-using SharpDX;
+using System.Drawing;
+using GameOffsets2.Native;
 
 namespace Radar;
 

@@ -1,8 +1,9 @@
-﻿using ExileCore.Shared.Attributes;
-using ExileCore.Shared.Interfaces;
-using ExileCore.Shared.Nodes;
+﻿using System.Drawing;
+using System.Numerics;
+using ExileCore2.Shared.Attributes;
+using ExileCore2.Shared.Interfaces;
+using ExileCore2.Shared.Nodes;
 using Newtonsoft.Json;
-using SharpDX;
 
 namespace Radar;
 
@@ -68,7 +69,7 @@ public class RadarSettings : ISettings
     public ToggleNode Enable { get; set; } = new ToggleNode(true);
     public RangeNode<float> CustomScale { get; set; } = new RangeNode<float>(1, 0.1f, 10);
     public ToggleNode DrawWalkableMap { get; set; } = new ToggleNode(true);
-    public ColorNode TerrainColor { get; set; } = new ColorNode(new Color(new Vector3(150f) / byte.MaxValue));
+    public ColorNode TerrainColor { get; set; } = new ColorNode(Color.FromArgb(150, 150, 150, 150));
     public RangeNode<int> MaximumMapTextureDimension { get; set; } = new RangeNode<int>(4096, 100, 4096);
     public RangeNode<int> MaximumPathCount { get; set; } = new RangeNode<int>(1000, 0, 1000);
     public PathfindingSettings PathfindingSettings { get; set; } = new PathfindingSettings();

@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using ExileCore;
-using ExileCore.PoEMemory.Elements;
-using ExileCore.PoEMemory.MemoryObjects;
-using ExileCore.Shared;
-using ExileCore.Shared.Helpers;
-using GameOffsets;
-using GameOffsets.Native;
+using System.Threading.Tasks;
+using ExileCore2;
+using ExileCore2.PoEMemory.Elements;
+using ExileCore2.PoEMemory.MemoryObjects;
+using ExileCore2.Shared;
+using ExileCore2.Shared.Helpers;
+using GameOffsets2;
+using GameOffsets2.Native;
 using ImGuiNET;
-using Color = SharpDX.Color;
-using Positioned = ExileCore.PoEMemory.Components.Positioned;
+using Positioned = ExileCore2.PoEMemory.Components.Positioned;
 using RectangleF = SixLabors.ImageSharp.RectangleF;
 
 namespace Radar;
@@ -41,7 +42,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
     private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
     private ConcurrentDictionary<Vector2i, List<string>> _locationsByPosition = new();
-    private SharpDX.RectangleF _rect;
+    private ExileCore2.Shared.RectangleF _rect;
     private ImDrawListPtr _backGroundWindowPtr;
     private ConcurrentDictionary<Vector2, RouteDescription> _routes = new();
 
@@ -102,13 +103,13 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         LoadTargets();
         Settings.Reload.OnPressed = () =>
         {
-            Core.MainRunner.Run(new Coroutine(() =>
+            Task.Run(() =>
             {
                 LoadTargets();
                 AreaChange(GameController.Area.CurrentArea);
-            }, new WaitTime(0), this, "RestartPathfinding", false, true));
+            });
         };
-        Settings.MaximumPathCount.OnValueChanged += (_, _) => { Core.MainRunner.Run(new Coroutine(RestartPathFinding, new WaitTime(0), this, "RestartPathfinding", false, true)); };
+        Settings.MaximumPathCount.OnValueChanged += (_, _) => { Task.Run(RestartPathFinding); };
         Settings.TerrainColor.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.DrawHeightMap.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.SkipEdgeDetector.OnValueChanged += (_, _) => { GenerateMapTexture(); };
@@ -127,7 +128,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             if (_currentZoneTargetEntityPaths.FirstOrDefault(x=>x.Item1.IsMatch(path)).x is {} targetDescription)
             {
                 bool alreadyContains = false;
-                var truncatedPos = positioned.GridPosNum.Truncate();
+                var truncatedPos = positioned.GridPos.Truncate();
                 _allTargetLocations.AddOrUpdate(targetDescription.Name, _ => [truncatedPos],
                     // ReSharper disable once AssignmentInConditionalExpression
                     (_, l) => (alreadyContains = l.Contains(truncatedPos)) ? l : [..l, truncatedPos]);
@@ -173,7 +174,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             return;
         }
 
-        _rect = GameController.Window.GetWindowRectangle() with { Location = Vector2.Zero.ToSharpDx() };
+        _rect = GameController.Window.GetWindowRectangle() with { Location = Vector2.Zero };
         if (!Settings.Debug.DisableDrawRegionLimiting)
         {
             if (ingameUi.OpenRightPanel.IsVisible)
@@ -221,10 +222,10 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             (!largeMap.IsVisible || !Settings.PathfindingSettings.WorldPathSettings.ShowPathsToTargetsOnlyWithClosedMap))
         {
             var player = GameController.Game.IngameState.Data.LocalPlayer;
-            var playerRender = player?.GetComponent<ExileCore.PoEMemory.Components.Render>();
+            var playerRender = player?.GetComponent<ExileCore2.PoEMemory.Components.Render>();
             if (playerRender == null)
                 return;
-            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.PosNum with { Z = playerRender.RenderStruct.Height });
+            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.Pos with { Z = playerRender.RenderStruct.Height });
             foreach (var (route, offsetAmount) in _routes.Values
                          .GroupBy(x => x.Path.Count < 2 ? 0 : (x.Path[1] - x.Path[0]) switch { var diff => Math.Atan2(diff.Y, diff.X) })
                          .SelectMany(group => group.Select((route, i) => (route, i - group.Count() / 2.0f + 0.5f))))
@@ -278,10 +279,10 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
     private void DrawLargeMap(Vector2 mapCenter)
     {
-        if (!Settings.DrawWalkableMap || !Graphics.LowLevel.HasTexture(TextureName) || _areaDimensions == null)
+        if (!Settings.DrawWalkableMap || !Graphics.HasImage(TextureName) || _areaDimensions == null)
             return;
         var player = GameController.Game.IngameState.Data.LocalPlayer;
-        var playerRender = player.GetComponent<ExileCore.PoEMemory.Components.Render>();
+        var playerRender = player.GetComponent<ExileCore2.PoEMemory.Components.Render>();
         if (playerRender == null)
             return;
         var rectangleF = new RectangleF(-playerRender.GridPos().X, -playerRender.GridPos().Y, _areaDimensions.Value.X, _areaDimensions.Value.Y);
@@ -290,14 +291,14 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
         var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
         var p4 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Bottom), playerHeight);
-        _backGroundWindowPtr.AddImageQuad(Graphics.LowLevel.GetTexture(TextureName), p1, p2, p3, p4);
+        _backGroundWindowPtr.AddImageQuad(Graphics.GetTextureId(TextureName), p1, p2, p3, p4);
     }
 
     private void DrawTargets(Vector2 mapCenter)
     {
         var color = Settings.PathfindingSettings.TargetNameColor.Value;
         var player = GameController.Game.IngameState.Data.LocalPlayer;
-        var playerRender = player.GetComponent<ExileCore.PoEMemory.Components.Render>();
+        var playerRender = player.GetComponent<ExileCore2.PoEMemory.Components.Render>();
         if (playerRender == null)
             return;
         var playerPosition = new Vector2(playerRender.GridPos().X, playerRender.GridPos().Y);
@@ -331,7 +332,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
                 var text = string.Join("\n", texts.Distinct().Where(TargetFilter));
                 var textOffset = Graphics.MeasureText(text) / 2f;
-                var mapDelta = TranslateGridDeltaToMapDelta(location.ToVector2Num() - playerPosition, playerHeight + _heightData[location.Y][location.X]);
+                var mapDelta = TranslateGridDeltaToMapDelta(location - playerPosition, playerHeight + _heightData[location.Y][location.X]);
                 var mapPos = mapCenter + mapDelta;
                 if (Settings.PathfindingSettings.EnableTargetNameBackground)
                     DrawBox(mapPos - textOffset, mapPos + textOffset, Color.Black);

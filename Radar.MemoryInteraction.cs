@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ExileCore.Shared.Helpers;
+using ExileCore2;
+using ExileCore2.Shared.Helpers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -155,6 +156,7 @@ public partial class Radar
         //unfortunately the library doesn't respect our allocation settings above
         
         using var imageCopy = image.Clone(configuration);
-        Graphics.LowLevel.AddOrUpdateTexture(TextureName, imageCopy);
+        imageCopy.Save("test.png");
+        Graphics.AddOrUpdateImage(TextureName, imageCopy);
     }
 }

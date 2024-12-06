@@ -16,12 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ExileCore">
-      <HintPath>$(exapiPackage)\ExileCore.dll</HintPath>
+    <Reference Include="ExileCore2">
+      <HintPath>$(exapiPackage)\ExileCore2.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="GameOffsets">
-      <HintPath>$(exapiPackage)\GameOffsets.dll</HintPath>
+    <Reference Include="GameOffsets2">
+      <HintPath>$(exapiPackage)\GameOffsets2.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -29,7 +29,6 @@
   <ItemGroup>
     <PackageReference Include="ImGui.NET" Version="1.90.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
   </ItemGroup>
 </Project>
