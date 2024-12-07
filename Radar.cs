@@ -73,7 +73,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 .ToDictionary(x => x.Key, x => x.ToList()));
             _areaDimensions = GameController.IngameState.Data.AreaDimensions;
             _processedTerrainData = GameController.IngameState.Data.RawPathfindingData;
-            DumpInstanceData($"{DirectoryFullName}\\instance_dumps\\{GameController.Area.CurrentArea.Area.RawName}_data.json");
+            DumpInstanceData($"{DirectoryFullName}\\instance_dumps\\{GameController.Area.CurrentArea.Area.RawName}.json");
             GenerateMapTexture();
             _clusteredTargetLocations = ClusterTargets();
             StartPathFinding();
