@@ -64,7 +64,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         StopPathFinding();
         if (GameController.Game.IsInGameState || GameController.Game.IsEscapeState)
         {
-            _targetDescriptionsInArea = GetTargetDescriptionsInArea().ToDictionary(x => x.Name);
+            _targetDescriptionsInArea = GetTargetDescriptionsInArea().DistinctBy(x => x.Name).ToDictionary(x => x.Name);
             _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).DistinctBy(x => x.Name).Select(x=>(x.Name.ToLikeRegex(), x)).ToList();
             _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
             _heightData = GameController.IngameState.Data.RawTerrainHeightData;
