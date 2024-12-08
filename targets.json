@@ -1,6 +1,11 @@
 {
   "G1_2": [
     {
+      "Name": "special",
+      "ExpectedCount": 1,
+      "DisplayName": "Clearfell Encampment"
+    },
+    {
       "Name": "Metadata/Terrain/Woods/Slash/HagWitchArena_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Beira of the Rotten"
@@ -27,19 +32,16 @@
       "ExpectedCount": 1,
       "DisplayName": "Clearfell"
     },
-
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/OldForestToGrimTangle_02_metatile.tdt",
       "ExpectedCount": 1,
       "DisplayName": "The Grim Tangle"
     },
-
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/redvale_transition_02_oldforest.tdt",
       "ExpectedCount": 1,
       "DisplayName": "The Red Vale"
     },
-
     {
       "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/GrimtangleTransitionDown_02.tdt",
       "ExpectedCount": 1,
@@ -367,7 +369,35 @@
       "DisplayName": "The Water Goddess"
     }
   ],
-
+  "G2_5_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/Badlands_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/Landmark_feature_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Fossilised Memorial"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Bone Pits"
+    }
+  ],
+  "G2_5_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mastodon Badlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/MastodonArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Blackrib Pit"
+    }
+  ],
   "G2_6": [
     {
       "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/TitanQuest01.tdt",
@@ -400,7 +430,6 @@
       "DisplayName": "Medallion"
     }
   ],
-
   "G2_7": [
     {
       "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Staircase_Entrance_01.tdt",
@@ -413,7 +442,6 @@
       "DisplayName": "Dais of Reckoning"
     }
   ],
-
   "G2_8": [
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBase_CartTransition_01.tdt",
@@ -431,7 +459,6 @@
       "DisplayName": "Path of Mourning"
     }
   ],
-
   "G2_9_1": [
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Lower/Wide/PillarLowerWide_StairsDown_01.tdt",
@@ -441,10 +468,45 @@
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Stair Up"
+      "DisplayName": "The Spires of Deshar"
     }
   ],
-
+  "G2_9_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tall/PillarTall_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Path of Mourning"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Shrine of the Sisters"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
+  "G2_12_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Dreadnought Vanguard"
+    }
+  ],
+  "G2_12_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Dreadnought"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/Features/DreadnoughtArena_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Faridun Throne"
+    }
+  ],
   "G2_13": [
     {
       "Name": "Metadata/Terrain/Desert/KethAscendancy/Level_1/Feature/pedestal_02.tdt",
@@ -452,42 +514,12 @@
       "DisplayName": "Relic Altar"
     }
   ],
-
-  "G2_5_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/Badlands_Entrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Ardura Caravan"
-    },
-
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/Landmark_feature_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Fossilised Memorial"
-    },
-
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Bone Pits"
-    }
-  ],
-
-  "G2_5_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Mastodon Badlands"
-    },
-
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/MastodonArena_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Blackrib Pit"
-    }
-  ],
-
   "C_G1_2": [
+    {
+      "Name": "special",
+      "ExpectedCount": 1,
+      "DisplayName": "Clearfell Encampment"
+    },
     {
       "Name": "Metadata/Terrain/Woods/Slash/HagWitchArena_01.tdt",
       "ExpectedCount": 1,
@@ -529,6 +561,11 @@
       "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/GrimtangleTransitionDown_02.tdt",
       "ExpectedCount": 1,
       "DisplayName": "The Corpse Tree"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/BurnTheWitch_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Areagne's Hut"
     }
   ],
   "C_G1_5": [
@@ -653,6 +690,11 @@
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Ogham Village"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Bosstile_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Crop Circle"
     }
   ],
   "C_G1_13_2": [
@@ -660,11 +702,6 @@
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition_village_side.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Ogham Farmlands"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Village/Blacksmith_Large.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Renly's Tools"
     },
     {
       "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02.tdt",
@@ -773,15 +810,221 @@
     {
       "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Boss"
+      "DisplayName": "Infested Tower"
+    }
+  ],
+  "C_G2_4_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Cityroof_Entrance.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Keth_Stairs_RuinEntrance.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Lost City"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Keth_SinkholeTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Looted Vault"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/QueenKabalaRoom_01_meta01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Venom Pit"
+    }
+  ],
+  "C_G2_4_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/KethEntrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Keth"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Buried Shrines"
+    }
+  ],
+  "C_G2_4_3": [
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Lost City"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Floor/Floortrim_BossMedallion_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Elemental Offering"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Floor/ThickWall_TransitionWide_St_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Buried Shrines"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_BossTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Heart of Keth"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Arena/CentrePattern_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Vestibule"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Arena/Thickwall_GoddessStatue_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Water Goddess"
+    }
+  ],
+  "C_G2_5_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/Badlands_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/Landmark_feature_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Fossilised Memorial"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Bone Pits"
+    }
+  ],
+  "C_G2_5_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mastodon Badlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/MastodonArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Blackrib Pit"
+    }
+  ],
+  "C_G2_6": [
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/TitanQuest01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ancient Seal"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/TitanQuest02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ancient Seal"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/TitanQuest03.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ancient Seal"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/GrottoExit01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Titan Grotto"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/CartEntrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/titan_valley_boss_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Medallion"
+    }
+  ],
+  "C_G2_7": [
+    {
+      "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Staircase_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Valley of the Titans"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Titan_Arena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Dais of Reckoning"
+    }
+  ],
+  "C_G2_8": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBase_CartTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Base/Arena/bossroom_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Forgotten Corpses"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBaseWide_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Path of Mourning"
+    }
+  ],
+  "C_G2_9_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Lower/Wide/PillarLowerWide_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Deshar"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Spires of Deshar"
+    }
+  ],
+  "C_G2_9_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tall/PillarTall_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Path of Mourning"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Shrine of the Sisters"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
+  "C_G2_12_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Dreadnought Vanguard"
+    }
+  ],
+  "C_G2_12_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Dreadnought"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/Features/DreadnoughtArena_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Faridun Throne"
+    }
+  ],
+  "C_G2_13": [
+    {
+      "Name": "Metadata/Terrain/Desert/KethAscendancy/Level_1/Feature/pedestal_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Relic Altar"
     }
   ],
   "*": [
-    {
-      "Name": "Metadata/Terrain/Desert/AreaTransitions/Ruin_PassageStair_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Traitor's Passage"
-    },
     {
       "Name": "waypoint",
       "ExpectedCount": 1,
