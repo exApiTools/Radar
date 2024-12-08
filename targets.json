@@ -21,6 +21,28 @@
       "DisplayName": "Mud Burrow"
     }
   ],
+  "C_G1_2": [
+    {
+      "Name": "special",
+      "ExpectedCount": 1,
+      "DisplayName": "Clearfell Encampment"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Slash/HagWitchArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Beira of the Rotten"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/Clearfell_OldForest_Transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Grelwood"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/FallenTreeSlash_out.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mud Burrow"
+    }
+  ],
   "G1_4": [
     {
       "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
@@ -51,6 +73,48 @@
       "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/BurnTheWitch_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Areagne's Hut"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Brambleghast"
+    }
+  ],
+  "C_G1_4": [
+    {
+      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Moving Bramble"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/OldForest_Clearfell_transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Clearfell"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/OldForestToGrimTangle_02_metatile.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Grim Tangle"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/redvale_transition_02_oldforest.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Red Vale"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/GrimtangleTransitionDown_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Corpse Tree"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/BurnTheWitch_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Areagne's Hut"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Brambleghast"
     }
   ],
   "G1_5": [
@@ -60,7 +124,31 @@
       "DisplayName": "The Grelwood"
     }
   ],
+  "C_G1_5": [
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/redvale_transition_02_redvale.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Grelwood"
+    }
+  ],
   "G1_6": [
+    {
+      "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/IntroArea.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Grelwood"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/GrimtangleTransitionUp_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Cemetery of the Eternals"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GrimTangle/feature/BossArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Den of the Druid"
+    }
+  ],
+  "C_G1_6": [
     {
       "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/IntroArea.tdt",
       "ExpectedCount": 1,
@@ -99,7 +187,51 @@
       "DisplayName": "Mausoleum of the Praetor"
     }
   ],
+  "C_G1_7": [
+    {
+      "Name": "Metadata/Terrain/Woods/Graveyard/Feature/GraveyardArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena / Hunting Grounds"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Graveyard/Feature/GraveyardToGrimTangle_transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Grim Tangle"
+    },
+    {
+      "Name": "tomb_transition",
+      "ExpectedCount": 1,
+      "DisplayName": "Tomb of the Consort"
+    },
+    {
+      "Name": "mausoleum_transition",
+      "ExpectedCount": 1,
+      "DisplayName": "Mausoleum of the Praetor"
+    }
+  ],
   "G1_8": [
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Transition_Mausoleum_to_Graveyard_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Cemetery of the Eternals"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Mausoleum_SecretEntrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Forgotten Riches"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Transition_Tomb_to_Graveyard_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Unknown 2"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/MausoleumBoss_ArenaFloor.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Draven"
+    }
+  ],
+  "C_G1_8": [
     {
       "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Transition_Mausoleum_to_Graveyard_01.tdt",
       "ExpectedCount": 1,
@@ -148,7 +280,46 @@
       "DisplayName": "Ogham Farmlands"
     }
   ],
+  "C_G1_11": [
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/CliffRoad_Cnr_transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Cemetery of the Eternals"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/CanopyRoadTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Freythorn"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Features_Cairns/CairnBrecon.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Crowbell Start"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Features_Cairns/DolmenDeAzutan_03.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Crowbell Arena"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ogham Farmlands"
+    }
+  ],
   "G1_12": [
+    {
+      "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopySpireTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Hunting Grounds"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopyArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The King in the Mists"
+    }
+  ],
+  "C_G1_12": [
     {
       "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopySpireTransition_01.tdt",
       "ExpectedCount": 1,
@@ -182,6 +353,28 @@
       "DisplayName": "Crop Circle"
     }
   ],
+  "C_G1_13_1": [
+    {
+      "Name": "Metadata/Terrain/Woods/AreaTransitions/cliff_gate_transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Hunting Grounds"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/YurtUna_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Una's Home"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ogham Village"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Bosstile_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Crop Circle"
+    }
+  ],
   "G1_13_2": [
     {
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition_village_side.tdt",
@@ -189,17 +382,46 @@
       "DisplayName": "Ogham Farmlands"
     },
     {
+      "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Executioner's Block"
+    },
+    {
       "Name": "Metadata/Terrain/Woods/Village/Blacksmith_Large.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Renly's Tools"
+    }
+  ],
+  "C_G1_13_2": [
+    {
+      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition_village_side.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ogham Farmlands"
     },
     {
       "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Executioner's Block"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Village/Blacksmith_Large.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Renly's Tools"
     }
   ],
   "G1_14": [
+    {
+      "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02_courtyard_side.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Entrance"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Manor_GrandEntrance_Transition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Oghams Manor"
+    }
+  ],
+  "C_G1_14": [
     {
       "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02_courtyard_side.tdt",
       "ExpectedCount": 1,
@@ -243,7 +465,46 @@
       "DisplayName": "Throne of the Wolf"
     }
   ],
+  "C_G1_15": [
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/Manor_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Manor Ramparts"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_StairsDown_Cc_01.tdt",
+      "ExpectedCount": 2,
+      "DisplayName": "Stairs Down"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/Features/Chapel_boss_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Fallen Altar"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_OpenDoor_01.tdt",
+      "ExpectedCount": 5,
+      "DisplayName": "Door"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_AreaTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Up"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/Features/ArenaTop_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Throne of the Wolf"
+    }
+  ],
   "G2_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/UnwalkableDune/DunePlatform/Dune_Platform_Feature_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Raiders Cliffs"
+    }
+  ],
+  "C_G2_1": [
     {
       "Name": "Metadata/Terrain/Desert/UnwalkableDune/DunePlatform/Dune_Platform_Feature_01.tdt",
       "ExpectedCount": 1,
@@ -262,7 +523,31 @@
       "DisplayName": "Mawdun Mine"
     }
   ],
+  "C_G2_10_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/Quarry/Features/Maraketh_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Quarry/Features/MiningShaftCrane.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mawdun Mine"
+    }
+  ],
   "G2_10_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Quarry/Features/MiningShaftFloor.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mawdun Quarry"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Foundry/Features/Foundry_Bossroom_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Munitions Bunker"
+    }
+  ],
+  "C_G2_10_2": [
     {
       "Name": "Metadata/Terrain/Desert/Quarry/Features/MiningShaftFloor.tdt",
       "ExpectedCount": 1,
@@ -291,6 +576,23 @@
       "DisplayName": "Prison of the Disgraced"
     }
   ],
+  "C_G2_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/CavePath/Features/cave_entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/CavePath/Features/Thickwall_Cave_Entrance.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Halani Gates"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/TraitorsPassage/TraitorsPassage_Arena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Prison of the Disgraced"
+    }
+  ],
   "G2_3": [
     {
       "Name": "Metadata/Terrain/Desert/AreaTransitions/Ruin_PassageStair_01.tdt",
@@ -301,9 +603,53 @@
       "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Infested Tower"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Boss"
+    }
+  ],
+  "C_G2_3": [
+    {
+      "Name": "Metadata/Terrain/Desert/AreaTransitions/Ruin_PassageStair_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Traitor's Passage"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Tower"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Boss"
     }
   ],
   "G2_4_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Cityroof_Entrance.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Keth_Stairs_RuinEntrance.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Lost City"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Keth_SinkholeTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Looted Vault"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/QueenKabalaRoom_01_meta01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Venom Pit"
+    }
+  ],
+  "C_G2_4_1": [
     {
       "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Cityroof_Entrance.tdt",
       "ExpectedCount": 1,
@@ -337,7 +683,51 @@
       "DisplayName": "Buried Shrines"
     }
   ],
+  "C_G2_4_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/KethEntrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Keth"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Buried Shrines"
+    }
+  ],
   "G2_4_3": [
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Lost City"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Floor/Floortrim_BossMedallion_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Elemental Offering"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Floor/ThickWall_TransitionWide_St_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Buried Shrines"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_BossTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Heart of Keth"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Arena/CentrePattern_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Vestibule"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Maraketh/Arena/Thickwall_GoddessStatue_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Water Goddess"
+    }
+  ],
+  "C_G2_4_3": [
     {
       "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsUp_01.tdt",
       "ExpectedCount": 1,
@@ -386,7 +776,36 @@
       "DisplayName": "The Bone Pits"
     }
   ],
+  "C_G2_5_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/Badlands_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/Landmark_feature_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Fossilised Memorial"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Bone Pits"
+    }
+  ],
   "G2_5_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mastodon Badlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Badlands/Features/MastodonArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Blackrib Pit"
+    }
+  ],
+  "C_G2_5_2": [
     {
       "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
       "ExpectedCount": 1,
@@ -430,484 +849,6 @@
       "DisplayName": "Medallion"
     }
   ],
-  "G2_7": [
-    {
-      "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Staircase_Entrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Valley of the Titans"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Titan_Arena_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Dais of Reckoning"
-    }
-  ],
-  "G2_8": [
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBase_CartTransition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Ardura Caravan"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Base/Arena/bossroom_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Forgotten Corpses"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBaseWide_StairsUp_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Path of Mourning"
-    }
-  ],
-  "G2_9_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Lower/Wide/PillarLowerWide_StairsDown_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Deshar"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Spires of Deshar"
-    }
-  ],
-  "G2_9_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Tall/PillarTall_StairsDown_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Path of Mourning"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Shrine of the Sisters"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Arena"
-    }
-  ],
-  "G2_12_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Dreadnought Vanguard"
-    }
-  ],
-  "G2_12_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Dreadnought"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/FarudinCarts/Features/DreadnoughtArena_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Faridun Throne"
-    }
-  ],
-  "G2_13": [
-    {
-      "Name": "Metadata/Terrain/Desert/KethAscendancy/Level_1/Feature/pedestal_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Relic Altar"
-    }
-  ],
-  "C_G1_2": [
-    {
-      "Name": "special",
-      "ExpectedCount": 1,
-      "DisplayName": "Clearfell Encampment"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Slash/HagWitchArena_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Beira of the Rotten"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/Clearfell_OldForest_Transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Grelwood"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/FallenTreeSlash_out.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Mud Burrow"
-    }
-  ],
-  "C_G1_4": [
-    {
-      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Moving Bramble"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/OldForest_Clearfell_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Clearfell"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/OldForestToGrimTangle_02_metatile.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Grim Tangle"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/redvale_transition_02_oldforest.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Red Vale"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/GrimtangleTransitionDown_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Corpse Tree"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/BurnTheWitch_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Areagne's Hut"
-    }
-  ],
-  "C_G1_5": [
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/redvale_transition_02_redvale.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Grelwood"
-    }
-  ],
-  "C_G1_6": [
-    {
-      "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/IntroArea.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Grelwood"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/GrimTangle/areatransitions/GrimtangleTransitionUp_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Cemetery of the Eternals"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/GrimTangle/feature/BossArena_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Den of the Druid"
-    }
-  ],
-  "C_G1_7": [
-    {
-      "Name": "Metadata/Terrain/Woods/Graveyard/Feature/GraveyardArena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Arena / Hunting Grounds"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Graveyard/Feature/GraveyardToGrimTangle_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Grim Tangle"
-    },
-    {
-      "Name": "tomb_transition",
-      "ExpectedCount": 1,
-      "DisplayName": "Tomb of the Consort"
-    },
-    {
-      "Name": "mausoleum_transition",
-      "ExpectedCount": 1,
-      "DisplayName": "Mausoleum of the Praetor"
-    }
-  ],
-  "C_G1_8": [
-    {
-      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Transition_Mausoleum_to_Graveyard_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Cemetery of the Eternals"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Mausoleum_SecretEntrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Forgotten Riches"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Transitions/Transition_Tomb_to_Graveyard_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Unknown 2"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/MausoleumBoss_ArenaFloor.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Draven"
-    }
-  ],
-  "C_G1_11": [
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/CliffRoad_Cnr_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Cemetery of the Eternals"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/CanopyRoadTransition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Freythorn"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Features_Cairns/CairnBrecon.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Crowbell Start"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Features_Cairns/DolmenDeAzutan_03.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Crowbell Arena"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Ogham Farmlands"
-    }
-  ],
-  "C_G1_12": [
-    {
-      "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopySpireTransition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Hunting Grounds"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopyArena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The King in the Mists"
-    }
-  ],
-  "C_G1_13_1": [
-    {
-      "Name": "Metadata/Terrain/Woods/AreaTransitions/cliff_gate_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Hunting Grounds"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/YurtUna_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Una's Home"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Ogham Village"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Bosstile_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Crop Circle"
-    }
-  ],
-  "C_G1_13_2": [
-    {
-      "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition_village_side.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Ogham Farmlands"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Executioner's Block"
-    }
-  ],
-  "C_G1_14": [
-    {
-      "Name": "Metadata/Terrain/Woods/Village/Huts/VillageArena_02_courtyard_side.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Entrance"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Manor_GrandEntrance_Transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Oghams Manor"
-    }
-  ],
-  "C_G1_15": [
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/Manor_Entrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Manor Ramparts"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_StairsDown_Cc_01.tdt",
-      "ExpectedCount": 2,
-      "DisplayName": "Stairs Down"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/Features/Chapel_boss_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Fallen Altar"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_OpenDoor_01.tdt",
-      "ExpectedCount": 5,
-      "DisplayName": "Door"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_AreaTransition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Stairs Up"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/Manor/Features/ArenaTop_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Throne of the Wolf"
-    }
-  ],
-  "C_G2_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/UnwalkableDune/DunePlatform/Dune_Platform_Feature_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Raiders Cliffs"
-    }
-  ],
-  "C_G2_10_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/Quarry/Features/Maraketh_Entrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Ardura Caravan"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Quarry/Features/MiningShaftCrane.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Mawdun Mine"
-    }
-  ],
-  "C_G2_10_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/Quarry/Features/MiningShaftFloor.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Mawdun Quarry"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Foundry/Features/Foundry_Bossroom_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Munitions Bunker"
-    }
-  ],
-  "C_G2_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/CavePath/Features/cave_entrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Ardura Caravan"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/CavePath/Features/Thickwall_Cave_Entrance.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Halani Gates"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/TraitorsPassage/TraitorsPassage_Arena_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Prison of the Disgraced"
-    }
-  ],
-  "C_G2_3": [
-    {
-      "Name": "Metadata/Terrain/Desert/AreaTransitions/Ruin_PassageStair_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Traitor's Passage"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Infested Tower"
-    }
-  ],
-  "C_G2_4_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Cityroof_Entrance.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Ardura Caravan"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Keth_Stairs_RuinEntrance.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Lost City"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/Keth_SinkholeTransition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Looted Vault"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/BuriedCity/Features/QueenKabalaRoom_01_meta01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Venom Pit"
-    }
-  ],
-  "C_G2_4_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Features/KethEntrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Keth"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsDown_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Buried Shrines"
-    }
-  ],
-  "C_G2_4_3": [
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_StairsUp_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Lost City"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Floor/Floortrim_BossMedallion_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Elemental Offering"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Floor/ThickWall_TransitionWide_St_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Buried Shrines"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Features/Thickwall_BossTransition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Heart of Keth"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Arena/CentrePattern_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Vestibule"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Maraketh/Arena/Thickwall_GoddessStatue_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Water Goddess"
-    }
-  ],
-  "C_G2_5_1": [
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/Badlands_Entrance_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Ardura Caravan"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/Landmark_feature_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Fossilised Memorial"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Bone Pits"
-    }
-  ],
-  "C_G2_5_2": [
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/AreaTransition_BadlandsToPits_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Mastodon Badlands"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Badlands/Features/MastodonArena_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Blackrib Pit"
-    }
-  ],
   "C_G2_6": [
     {
       "Name": "Metadata/Terrain/Desert/UnwalkableDune/Titans/Feature/TitanQuest01.tdt",
@@ -940,6 +881,18 @@
       "DisplayName": "Medallion"
     }
   ],
+  "G2_7": [
+    {
+      "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Staircase_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Valley of the Titans"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Titan_Arena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Dais of Reckoning"
+    }
+  ],
   "C_G2_7": [
     {
       "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Staircase_Entrance_01.tdt",
@@ -950,6 +903,23 @@
       "Name": "Metadata/Terrain/Desert/CaveTitans/Features/Titan_Arena_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Dais of Reckoning"
+    }
+  ],
+  "G2_8": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBase_CartTransition_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Ardura Caravan"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Base/Arena/bossroom_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Forgotten Corpses"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBaseWide_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Path of Mourning"
     }
   ],
   "C_G2_8": [
@@ -969,6 +939,18 @@
       "DisplayName": "Path of Mourning"
     }
   ],
+  "G2_9_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Lower/Wide/PillarLowerWide_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Deshar"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Spires of Deshar"
+    }
+  ],
   "C_G2_9_1": [
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Lower/Wide/PillarLowerWide_StairsDown_01.tdt",
@@ -979,6 +961,40 @@
       "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "The Spires of Deshar"
+    }
+  ],
+  "G2_9_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tall/PillarTall_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Path of Mourning"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Shrine of the Sisters"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
+  "C_G2_9_2_": [
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tall/PillarTall_StairsDown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Path of Mourning"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Shrine of the Sisters"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
     }
   ],
   "C_G2_9_2": [
@@ -998,11 +1014,30 @@
       "DisplayName": "Arena"
     }
   ],
+  "G2_12_1": [
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Dreadnought Vanguard"
+    }
+  ],
   "C_G2_12_1": [
     {
       "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Dreadnought Vanguard"
+    }
+  ],
+  "G2_12_2": [
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/cart_walkway_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Dreadnought"
+    },
+    {
+      "Name": "Metadata/Terrain/Desert/FarudinCarts/Features/DreadnoughtArena_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Faridun Throne"
     }
   ],
   "C_G2_12_2": [
@@ -1017,6 +1052,13 @@
       "DisplayName": "The Faridun Throne"
     }
   ],
+  "G2_13": [
+    {
+      "Name": "Metadata/Terrain/Desert/KethAscendancy/Level_1/Feature/pedestal_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Relic Altar"
+    }
+  ],
   "C_G2_13": [
     {
       "Name": "Metadata/Terrain/Desert/KethAscendancy/Level_1/Feature/pedestal_02.tdt",
@@ -1024,11 +1066,215 @@
       "DisplayName": "Relic Altar"
     }
   ],
+  "G3_1": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/SandToWater/Feature/EntranceCaravanFord_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mini Town"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/SandsweptMarsh/bossman.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Foul Ritual"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Fills/JungleGroundPuddle_04.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Azak Campfire"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/SandsweptMarsh/marsh_exit.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
+    }
+  ],
+  "C_G3_1": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/SandToWater/Feature/EntranceCaravanFord_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mini Town"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/SandsweptMarsh/bossman.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Foul Ritual"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Fills/JungleGroundPuddle_04.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Azak Campfire"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/SandsweptMarsh/marsh_exit.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
+    }
+  ],
+  "G3_2_1": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleToWaterways_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jungle Ruins"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/AntHill/AntHollow/hollow_StSW_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Larva Hollow"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwayAltar_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Canal Mechanism"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Azak Bog"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_ChimeralWetlands.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Chimeral Wetlands"
+    }
+  ],
+  "C_G3_2_1": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleToWaterways_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jungle Ruins"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/AntHill/AntHollow/hollow_StSW_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Larva Hollow"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwayAltar_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Canal Mechanism"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Azak Bog"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_ChimeralWetlands.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Chimeral Wetlands"
+    }
+  ],
+  "G3_3": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_Town.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_SnakePit.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Venom Crypts"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleToWaterways_01_reverse.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    }
+  ],
+  "C_G3_3": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_Town.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_SnakePit.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Venom Crypts"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleToWaterways_01_reverse.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    }
+  ],
+  "G3_4": [
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SnakePit_to_JungleDepths.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jungle Ruins"
+    }
+  ],
+  "C_G3_4": [
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SnakePit_to_JungleDepths.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jungle Ruins"
+    }
+  ],
+  "G3_7": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gor-gor Mog"
+    }
+  ],
+  "C_G3_7": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gor-gor Mog"
+    }
+  ],
   "*": [
     {
       "Name": "waypoint",
       "ExpectedCount": 1,
       "DisplayName": "waypoint"
+    }
+  ],
+  "G3_5": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/ChimeralWetlands_to_JungleDepths.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/ChimeralJungle_to_ChaosTemple.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Temple of Chaos"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/Observatory_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Deadly Nest"
+    }
+  ],
+  "G3_6_1": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_cave_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Transition"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextStairs/dungeon_stairs_straight_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stair Place"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Exit"
     }
   ]
 }
