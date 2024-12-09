@@ -267,7 +267,7 @@
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
       "ExpectedCount": 2,
-      "DisplayName": "Ogham Farmlands\nOr Deadend"
+      "DisplayName": "Ogham Farmlands Or Deadend"
     }
   ],
   "C_G1_11": [
@@ -293,8 +293,8 @@
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Ogham Farmlands\nOr Deadend"
+      "ExpectedCount": 2,
+      "DisplayName": "Ogham Farmlands Or Deadend"
     }
   ],
   "G1_12": [
@@ -1252,6 +1252,16 @@
   ],
   "G3_6_1": [
     {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Oubliette (Rire res)"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jiquani's Sanctum"
+    },
+    {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_cave_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Transition"
@@ -1260,15 +1270,20 @@
       "Name": "Metadata/Terrain/Dungeon/NextStairs/dungeon_stairs_straight_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Stair Place"
-    },
-    {
-      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Exit"
     }
   ],
   "C_G3_6_1": [
     {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Oubliette (Rire res)"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jiquani's Sanctum"
+    },
+    {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_cave_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Transition"
@@ -1277,11 +1292,18 @@
       "Name": "Metadata/Terrain/Dungeon/NextStairs/dungeon_stairs_straight_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Stair Place"
+    }
+  ],
+  "G3_6_2": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/Machinarium/BossWall01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Boss"
     },
     {
-      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "Name": "Metadata/Terrain/Jungle/VaalInterior/VaalGenerator/VaalGenerator.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Exit"
+      "DisplayName": "Generator"
     }
   ],
   "C_G3_6_2": [
@@ -1446,6 +1468,18 @@
       "DisplayName": "stairs"
     }
   ],
+  "*": [
+    {
+      "Name": "waypoint",
+      "ExpectedCount": 1,
+      "DisplayName": "waypoint"
+    },
+    {
+      "Name": "ritual_site",
+      "ExpectedCount": 1,
+      "DisplayName": "Ritual Site"
+    }
+  ],
   "G3_14": [
     {
       "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCity/jungle_pyramid_entrance_atziri_01_metatile.tdt",
@@ -1560,18 +1594,6 @@
       "ExpectedCount": 99,
       "DisplayName": "Hourglass",
       "TargetType": "Entity"
-    }
-  ],
-  "*": [
-    {
-      "Name": "waypoint",
-      "ExpectedCount": 1,
-      "DisplayName": "waypoint"
-    },
-    {
-      "Name": "ritual_site",
-      "ExpectedCount": 1,
-      "DisplayName": "Ritual Site"
     }
   ]
 }
