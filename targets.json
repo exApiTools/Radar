@@ -307,12 +307,6 @@
       "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopyArena.tdt",
       "ExpectedCount": 1,
       "DisplayName": "The King in the Mists"
-    },
-    {
-      "Name": "Metadata/Terrain/Gallows/Act1/1_12/Objects/CanopyRitualAltar",
-      "ExpectedCount": 4,
-      "DisplayName": "Ritual Altar",
-      "TargetType": "Entity"
     }
   ],
   "C_G1_12": [
@@ -325,12 +319,6 @@
       "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopyArena.tdt",
       "ExpectedCount": 1,
       "DisplayName": "The King in the Mists"
-    },
-    {
-      "Name": "Metadata/Terrain/Gallows/Act1/1_12/Objects/CanopyRitualAltar",
-      "ExpectedCount": 4,
-      "DisplayName": "Ritual Altar",
-      "TargetType": "Entity"
     }
   ],
   "G1_13_1": [
