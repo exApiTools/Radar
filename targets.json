@@ -73,11 +73,6 @@
       "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/BurnTheWitch_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Areagne's Hut"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Brambleghast"
     }
   ],
   "C_G1_4": [
@@ -110,11 +105,6 @@
       "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/BurnTheWitch_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Areagne's Hut"
-    },
-    {
-      "Name": "Metadata/Terrain/Woods/OldForestWoods/Feature/PlantBoss_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "The Brambleghast"
     }
   ],
   "G1_5": [
@@ -276,8 +266,8 @@
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Ogham Farmlands"
+      "ExpectedCount": 2,
+      "DisplayName": "Ogham Farmlands\nOr Deadend"
     }
   ],
   "C_G1_11": [
@@ -304,7 +294,7 @@
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Ogham Farmlands"
+      "DisplayName": "Ogham Farmlands\nOr Deadend"
     }
   ],
   "G1_12": [
@@ -603,11 +593,6 @@
       "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Infested Tower"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Boss"
     }
   ],
   "C_G2_3": [
@@ -620,11 +605,6 @@
       "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Infested Tower"
-    },
-    {
-      "Name": "Metadata/Terrain/Desert/Gates/Features/boss_arena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Boss"
     }
   ],
   "G2_4_1": [
