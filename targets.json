@@ -1144,6 +1144,30 @@
       "DisplayName": "Chimeral Wetlands"
     }
   ],
+  "G3_2_2": [
+	{
+		"Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Waterways Lever"
+	},
+	{
+		"Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Narag's Hut"
+	}
+  ],
+  "C_G3_2_2": [
+	{
+		"Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Waterways Lever"
+	},
+	{
+		"Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Narag's Hut"
+	}
+  ],
   "G3_3": [
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_Town.tdt",
@@ -1192,38 +1216,24 @@
       "DisplayName": "Jungle Ruins"
     }
   ],
-  "G3_7": [
-    {
-      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Infested Barrens"
-    },
-    {
-      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Gor-gor Mog"
-    }
-  ],
-  "C_G3_7": [
-    {
-      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_01.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Infested Barrens"
-    },
-    {
-      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Gor-gor Mog"
-    }
-  ],
-  "*": [
-    {
-      "Name": "waypoint",
-      "ExpectedCount": 1,
-      "DisplayName": "waypoint"
-    }
-  ],
   "G3_5": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/ChimeralWetlands_to_JungleDepths.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/ChimeralJungle_to_ChaosTemple.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Temple of Chaos"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/Observatory_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Deadly Nest"
+    }
+  ],
+  "C_G3_5": [
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/ChimeralWetlands_to_JungleDepths.tdt",
       "ExpectedCount": 1,
@@ -1255,6 +1265,197 @@
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Exit"
+    }
+  ],
+  "C_G3_6_1": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_cave_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Transition"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextStairs/dungeon_stairs_straight_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stair Place"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Exit"
+    }
+  ],
+  "C_G3_6_2": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/Machinarium/BossWall01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Boss"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/VaalInterior/VaalGenerator/VaalGenerator.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Generator"
+    }
+  ],
+  "G3_7": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gor-gor Mog"
+    }
+  ],
+  "C_G3_7": [
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/AreaTransition/EntranceBog_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gor-gor Mog"
+    }
+  ],
+  "G3_8": [
+    {
+		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/SunkenCityToTown_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Ziggurat Encampment"
+    },
+    {
+		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_vault_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "The Molten Vault"
+    },
+	{
+		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_atziri_03.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Apex of Filth"
+	}
+  ], 
+  "C_G3_8": [
+    {
+		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/SunkenCityToTown_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Ziggurat Encampment"
+    },
+    {
+		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_vault_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "The Molten Vault"
+    },
+	{
+		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_atziri_03.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Apex of Filth"
+	}
+  ], 
+  "G3_9": [
+	{
+		"Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Mektul, The Forgemaster"
+	}
+  ],
+  "C_G3_9": [
+	{
+		"Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Mektul, The Forgemaster"
+	}
+  ],
+  "G3_11": [
+	{
+		"Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_Present_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Cauldron Keeper"
+	},
+	{
+		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Waypoint"
+	},
+	{
+		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Queen of Filth"
+	}
+  ],
+  "C_G3_11": [
+	{
+		"Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_Present_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Cauldron Keeper"
+	},
+	{
+		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Waypoint"
+	},
+	{
+		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Queen of Filth"
+	}
+  ],
+  "G3_12": [
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_to_sunkencity_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Ziggurat Encampment"
+	},
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "stairs"
+	},
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "stairs"
+	},
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "stairs"
+	}
+  ],
+  "C_G3_12": [
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_to_sunkencity_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "Ziggurat Encampment"
+	},
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "stairs"
+	},
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "stairs"
+	},
+	{
+		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
+		"ExpectedCount": 1,
+		"DisplayName": "stairs"
+	}
+  ],
+  "*": [
+    {
+      "Name": "waypoint",
+      "ExpectedCount": 1,
+      "DisplayName": "waypoint"
+    },
+    {
+      "Name": "ritual_site",
+      "ExpectedCount": 1,
+      "DisplayName": "Ritual Site"
     }
   ]
 }
