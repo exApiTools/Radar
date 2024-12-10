@@ -243,6 +243,30 @@
       "DisplayName": "Draven"
     }
   ],
+  "G1_9": [
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/TombBoss_ArenaFloor.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Asinia"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/Tomb_Landmark_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Embattled Trove"
+    }
+  ],  
+  "C_G1_9": [
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/TombBoss_ArenaFloor.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Asinia"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/Tomb_Landmark_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Embattled Trove"
+    }
+  ],    
   "G1_11": [
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/CliffRoad_Cnr_transition_01.tdt",
@@ -268,6 +292,11 @@
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
       "ExpectedCount": 2,
       "DisplayName": "Ogham Farmlands Or Deadend"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/HuntingGrounds/RitualClearing01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ritual Site"
     }
   ],
   "C_G1_11": [
@@ -295,6 +324,11 @@
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
       "ExpectedCount": 2,
       "DisplayName": "Ogham Farmlands Or Deadend"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/HuntingGrounds/RitualClearing01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ritual Site"
     }
   ],
   "G1_12": [
@@ -409,6 +443,11 @@
       "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Manor_GrandEntrance_Transition_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Oghams Manor"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Gallows_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gallows"
     }
   ],
   "C_G1_14": [
@@ -421,6 +460,11 @@
       "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Manor_GrandEntrance_Transition_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Oghams Manor"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Gallows_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gallows"
     }
   ],
   "G1_15": [
@@ -1518,11 +1562,6 @@
       "Name": "waypoint",
       "ExpectedCount": 1,
       "DisplayName": "waypoint"
-    },
-    {
-      "Name": "ritual_site",
-      "ExpectedCount": 1,
-      "DisplayName": "Ritual Site"
     }
   ],
   "G3_14": [
