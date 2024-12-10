@@ -243,6 +243,30 @@
       "DisplayName": "Draven"
     }
   ],
+  "G1_9": [
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/TombBoss_ArenaFloor.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Asinia"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/Tomb_Landmark_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Embattled Trove"
+    }
+  ],  
+  "C_G1_9": [
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/TombBoss_ArenaFloor.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Asinia"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/Tomb_Landmark_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Embattled Trove"
+    }
+  ],    
   "G1_11": [
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/CliffRoad_Cnr_transition_01.tdt",
@@ -267,7 +291,12 @@
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
       "ExpectedCount": 2,
-      "DisplayName": "Ogham Farmlands\nOr Deadend"
+      "DisplayName": "Ogham Farmlands Or Deadend"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/HuntingGrounds/RitualClearing01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ritual Site"
     }
   ],
   "C_G1_11": [
@@ -293,8 +322,13 @@
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
+      "ExpectedCount": 2,
+      "DisplayName": "Ogham Farmlands Or Deadend"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/HuntingGrounds/RitualClearing01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Ogham Farmlands\nOr Deadend"
+      "DisplayName": "Ritual Site"
     }
   ],
   "G1_12": [
@@ -409,6 +443,11 @@
       "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Manor_GrandEntrance_Transition_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Oghams Manor"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Gallows_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gallows"
     }
   ],
   "C_G1_14": [
@@ -421,6 +460,11 @@
       "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Manor_GrandEntrance_Transition_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Oghams Manor"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Manor/CourtyardFeatures/Gallows_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Gallows"
     }
   ],
   "G1_15": [
@@ -1115,6 +1159,11 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_ChimeralWetlands.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Chimeral Wetlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Waterway/Jungle_Waterway_Ramp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Matlan Waterways"
     }
   ],
   "C_G3_2_1": [
@@ -1142,31 +1191,41 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_ChimeralWetlands.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Chimeral Wetlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Waterway/Jungle_Waterway_Ramp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Matlan Waterways"
     }
   ],
   "G3_2_2": [
-	{
-		"Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Waterways Lever"
-	},
-	{
-		"Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Narag's Hut"
-	}
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Waterways Lever"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Narag's Hut"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Narag's Hut"
+    }
   ],
   "C_G3_2_2": [
-	{
-		"Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Waterways Lever"
-	},
-	{
-		"Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Narag's Hut"
-	}
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Waterways Lever"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Narag's Hut"
+    }
   ],
   "G3_3": [
     {
@@ -1252,6 +1311,16 @@
   ],
   "G3_6_1": [
     {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Oubliette (Rire res)"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jiquani's Sanctum"
+    },
+    {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_cave_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Transition"
@@ -1260,15 +1329,20 @@
       "Name": "Metadata/Terrain/Dungeon/NextStairs/dungeon_stairs_straight_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Stair Place"
-    },
-    {
-      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
-      "ExpectedCount": 1,
-      "DisplayName": "Exit"
     }
   ],
   "C_G3_6_1": [
     {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Oubliette (Rire res)"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Jiquani's Sanctum"
+    },
+    {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_cave_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Transition"
@@ -1277,11 +1351,23 @@
       "Name": "Metadata/Terrain/Dungeon/NextStairs/dungeon_stairs_straight_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Stair Place"
+    }
+  ],
+  "G3_6_2": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/Machinarium/BossWall01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Boss"
     },
     {
-      "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
+      "Name": "Metadata/Terrain/Jungle/VaalInterior/VaalGenerator/VaalGenerator.tdt",
+      "ExpectedCount": 2,
+      "DisplayName": "Generator"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/VaalCorruptionAltar.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Exit"
+      "DisplayName": "Corruption Altar"
     }
   ],
   "C_G3_6_2": [
@@ -1292,8 +1378,13 @@
     },
     {
       "Name": "Metadata/Terrain/Jungle/VaalInterior/VaalGenerator/VaalGenerator.tdt",
-      "ExpectedCount": 1,
+      "ExpectedCount": 2,
       "DisplayName": "Generator"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/VaalCorruptionAltar.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Corruption Altar"
     }
   ],
   "G3_7": [
@@ -1322,140 +1413,271 @@
   ],
   "G3_8": [
     {
-		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/SunkenCityToTown_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Ziggurat Encampment"
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/SunkenCityToTown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
     },
     {
-		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_vault_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "The Molten Vault"
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_vault_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Molten Vault"
     },
-	{
-		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_atziri_03.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Apex of Filth"
-	}
-  ], 
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_atziri_03.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Apex of Filth"
+    }
+  ],
   "C_G3_8": [
     {
-		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/SunkenCityToTown_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Ziggurat Encampment"
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/SunkenCityToTown_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
     },
     {
-		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_vault_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "The Molten Vault"
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_vault_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Molten Vault"
     },
-	{
-		"Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_atziri_03.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Apex of Filth"
-	}
-  ], 
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCityPresent/jungle_pyramid_entrance_atziri_03.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Apex of Filth"
+    }
+  ],
   "G3_9": [
-	{
-		"Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Mektul, The Forgemaster"
-	}
+    {
+      "Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mektul, The Forgemaster"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/TreasureVault/BrutalistThickwall/Brutal_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
+    }
   ],
   "C_G3_9": [
-	{
-		"Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Mektul, The Forgemaster"
-	}
+    {
+      "Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Mektul, The Forgemaster"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/TreasureVault/BrutalistThickwall/Brutal_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
+    }
   ],
   "G3_11": [
-	{
-		"Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_Present_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Cauldron Keeper"
-	},
-	{
-		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Waypoint"
-	},
-	{
-		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Queen of Filth"
-	}
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_Present_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Cauldron Keeper"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Waypoint"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Queen of Filth"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
+    }
   ],
   "C_G3_11": [
-	{
-		"Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_Present_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Cauldron Keeper"
-	},
-	{
-		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Waypoint"
-	},
-	{
-		"Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Queen of Filth"
-	}
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_Present_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Cauldron Keeper"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Waypoint"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Queen of Filth"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
+    }
   ],
   "G3_12": [
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_to_sunkencity_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Ziggurat Encampment"
-	},
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "stairs"
-	},
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "stairs"
-	},
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "stairs"
-	}
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_to_sunkencity_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Up"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Up"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Down"
+    }
   ],
   "C_G3_12": [
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_to_sunkencity_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "Ziggurat Encampment"
-	},
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "stairs"
-	},
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "stairs"
-	},
-	{
-		"Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
-		"ExpectedCount": 1,
-		"DisplayName": "stairs"
-	}
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_to_sunkencity_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Ziggurat Encampment"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Up"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Up"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs Down"
+    }
   ],
   "*": [
     {
       "Name": "waypoint",
       "ExpectedCount": 1,
       "DisplayName": "waypoint"
+    }
+  ],
+  "G3_14": [
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCity/jungle_pyramid_entrance_atziri_01_metatile.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Aggorat"
     },
     {
-      "Name": "ritual_site",
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCity/jungle_town_lower_entrance_past_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Ritual Site"
+      "DisplayName": "Town"
+    }
+  ],
+  "C_G3_14": [
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCity/jungle_pyramid_entrance_atziri_01_metatile.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Aggorat"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/SunkenCity/jungle_town_lower_entrance_past_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Town"
+    }
+  ],
+  "G3_16": [
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Aggorat_AtziriAltar_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Altar"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_Past_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Idol 1"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Sacrificial Dagger"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/DoryanisSanctumEntrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Black Chambers"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratToSunkenCity_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Utzaal"
+    }
+  ],
+  "C_G3_16_": [
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Aggorat_AtziriAltar_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Altar"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_Past_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Idol 1"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Sacrificial Dagger"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/DoryanisSanctumEntrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Black Chambers"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratToSunkenCity_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Utzaal"
+    }
+  ],
+  "G3_17": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/DoryanisSanctum/Features/Doryani_Arena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/DoryanisSanctumEntranceInt_01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Aggorat"
+    }
+  ],
+  "C_G3_17": [
+    {
+      "Name": "Metadata/Terrain/Dungeon/DoryanisSanctum/Features/Doryani_Arena_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/AreaTransitions/DoryanisSanctumEntranceInt_01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Aggorat"
+    }
+  ],
+  "Sanctum_*": [
+    {
+      "Name": "Metadata/Terrain/Gallows/Leagues/Sanctum/Objects/SanctumGenericLever",
+      "ExpectedCount": 99,
+      "DisplayName": "Lever",
+      "TargetType": "Entity"
+    },
+    {
+      "Name": "Metadata/Monsters/MarakethSanctumTrial/Hazards/HourglassLethal",
+      "ExpectedCount": 99,
+      "DisplayName": "Hourglass",
+      "TargetType": "Entity"
     }
   ]
 }
