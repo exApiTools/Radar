@@ -1115,6 +1115,11 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_ChimeralWetlands.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Chimeral Wetlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Waterway/Jungle_Waterway_Ramp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Matlan Waterways"
     }
   ],
   "C_G3_2_1": [
@@ -1142,6 +1147,11 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleDepths_to_ChimeralWetlands.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Chimeral Wetlands"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/Waterway/Jungle_Waterway_Ramp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Matlan Waterways"
     }
   ],
   "G3_2_2": [
@@ -1149,6 +1159,11 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/Feature/Jungle_WaterwaysLever_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Waterways Lever"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Narag's Hut"
     },
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/CvWW_01.tdt",
@@ -1302,8 +1317,13 @@
     },
     {
       "Name": "Metadata/Terrain/Jungle/VaalInterior/VaalGenerator/VaalGenerator.tdt",
-      "ExpectedCount": 1,
+      "ExpectedCount": 2,
       "DisplayName": "Generator"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/VaalCorruptionAltar.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Corruption Altar"
     }
   ],
   "C_G3_6_2": [
@@ -1314,8 +1334,13 @@
     },
     {
       "Name": "Metadata/Terrain/Jungle/VaalInterior/VaalGenerator/VaalGenerator.tdt",
-      "ExpectedCount": 1,
+      "ExpectedCount": 2,
       "DisplayName": "Generator"
+    },
+    {
+      "Name": "Metadata/Terrain/Dungeon/NextFeatures/VaalCorruptionAltar.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Corruption Altar"
     }
   ],
   "G3_7": [
@@ -1381,6 +1406,11 @@
       "Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Mektul, The Forgemaster"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/TreasureVault/BrutalistThickwall/Brutal_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
     }
   ],
   "C_G3_9": [
@@ -1388,6 +1418,11 @@
       "Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Mektul, The Forgemaster"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/TreasureVault/BrutalistThickwall/Brutal_Entrance_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
     }
   ],
   "G3_11": [
@@ -1405,6 +1440,11 @@
       "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Queen of Filth"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
     }
   ],
   "C_G3_11": [
@@ -1422,6 +1462,11 @@
       "Name": "Metadata/Terrain/Jungle/Aggorat/Features/AggoratArena_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Queen of Filth"
+    },
+    {
+      "Name": "Metadata/Terrain/Jungle/Aggorat/Features/Present/AggoratToSunkenCity_Present_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "The Drowned City"
     }
   ],
   "G3_12": [
@@ -1433,17 +1478,17 @@
     {
       "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "stairs"
+      "DisplayName": "Stairs Up"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "stairs"
+      "DisplayName": "Stairs Up"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "stairs"
+      "DisplayName": "Stairs Down"
     }
   ],
   "C_G3_12": [
@@ -1455,17 +1500,17 @@
     {
       "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "stairs"
+      "DisplayName": "Stairs Up"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsup_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "stairs"
+      "DisplayName": "Stairs Up"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/Ziggurat/ziggurat_outerwall_end_stairsdown_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "stairs"
+      "DisplayName": "Stairs Down"
     }
   ],
   "*": [
