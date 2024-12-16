@@ -1313,7 +1313,7 @@
     {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Oubliette (Rire res)"
+      "DisplayName": "The Oubliette (Fire res)"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
@@ -1676,8 +1676,15 @@
     {
       "Name": "Metadata/Monsters/MarakethSanctumTrial/Hazards/HourglassLethal",
       "ExpectedCount": 99,
-      "DisplayName": "Hourglass",
+      "DisplayName": "Crystal",
       "TargetType": "Entity"
+    }
+  ],
+  "MapLostTowers": [
+    {
+        "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
+        "ExpectedCount": 1,
+        "DisplayName": "Stairs"
     }
   ]
 }
