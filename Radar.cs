@@ -36,6 +36,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private TerrainData _terrainMetadata;
     private float[][] _heightData;
     private int[][] _processedTerrainData;
+    private int[][] _processedTerrainTargetingData;
     private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
     private List<(Regex, TargetDescription x)> _currentZoneTargetEntityPaths = new();
     private CancellationTokenSource _findPathsCts = new CancellationTokenSource();
@@ -75,6 +76,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 .ToDictionary(x => x.Key, x => x.ToList()));
             _areaDimensions = GameController.IngameState.Data.AreaDimensions;
             _processedTerrainData = GameController.IngameState.Data.RawPathfindingData;
+            _processedTerrainTargetingData = GameController.IngameState.Data.RawTerrainTargetingData;
 
             if (Settings.AutoDumpInstanceOnAreaChange)
             {
