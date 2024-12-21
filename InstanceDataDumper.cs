@@ -22,6 +22,7 @@ public class OptimizedInstanceData
     public int H { get; set; }
     public float[] Heights { get; set; }
     public int[] Walk { get; set; }
+    public int[] Target { get; set; }
     public List<TilePosition> Tiles { get; set; }
 }
 
@@ -29,7 +30,7 @@ public partial class Radar
 {
     public void DumpInstanceData(string outputPath)
     {
-        if (_heightData == null || _processedTerrainData == null || _areaDimensions == null)
+        if (_heightData == null || _processedTerrainData == null || _processedTerrainTargetingData == null || _areaDimensions == null)
         {
             return;
         }
@@ -41,6 +42,7 @@ public partial class Radar
             // Create flattened arrays
             var heights = new float[dimensions.X * dimensions.Y];
             var walk = new int[dimensions.X * dimensions.Y];
+            var target = new int[dimensions.X * dimensions.Y];
 
             // Fill the arrays
             for (var y = 0; y < dimensions.Y && y < _heightData.Length; y++)
@@ -50,6 +52,7 @@ public partial class Radar
                     var index = y * dimensions.X + x;
                     heights[index] = _heightData[y][x];
                     walk[index] = _processedTerrainData[y][x];
+                    target[index] = _processedTerrainTargetingData[y][x];
                 }
             }
 
@@ -70,6 +73,7 @@ public partial class Radar
                 H = dimensions.Y,
                 Heights = heights,
                 Walk = walk,
+                Target = target,
                 Tiles = tilePositions
             };
 
