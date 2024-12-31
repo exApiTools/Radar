@@ -967,6 +967,12 @@
       "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBaseWide_StairsUp_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Path of Mourning"
+    },
+    {
+      "Name": "Metadata/Chests/SpireCorpseChest",
+      "ExpectedCount": 1,
+      "DisplayName": "Fallen Dekhara (+2 Passive)",
+      "TargetType": "Entity"
     }
   ],
   "G2_9_1": [
