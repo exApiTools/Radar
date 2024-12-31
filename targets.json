@@ -8,7 +8,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Slash/HagWitchArena_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Beira of the Rotten"
+      "DisplayName": "Beira of the Rotten (Cold Res)"
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Clearfell_OldForest_Transition_01.tdt",
@@ -30,7 +30,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Slash/HagWitchArena_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Beira of the Rotten"
+      "DisplayName": "Beira of the Rotten (Cold Res)"
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Clearfell_OldForest_Transition_01.tdt",
@@ -286,7 +286,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Features_Cairns/DolmenDeAzutan_03.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Crowbell Arena"
+      "DisplayName": "Crowbell Arena (+2 Passive)"
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
@@ -318,7 +318,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Features_Cairns/DolmenDeAzutan_03.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Crowbell Arena"
+      "DisplayName": "Crowbell Arena (+2 Passive)"
     },
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/Bramble_Cnr_transition_01.tdt",
@@ -340,7 +340,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Canopy/Features/CanopyArena.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The King in the Mists"
+      "DisplayName": "The King in the Mists (+30 Spirit)"
     }
   ],
   "C_G1_12": [
@@ -364,7 +364,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/YurtUna_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Una's Home"
+      "DisplayName": "Una's Lute (+2 Passive)"
     },
     {
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition.tdt",
@@ -386,7 +386,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/YurtUna_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Una's Home"
+      "DisplayName": "Una's Lute (+2 Passive)"
     },
     {
       "Name": "Metadata/Terrain/Woods/Village/RoadFields/Feature/RoadVillage_Areatransition.tdt",
@@ -413,7 +413,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Village/Blacksmith_Large.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Renly's Tools"
+      "DisplayName": "Renly's Tools (Salvaging Bench)"
     }
   ],
   "C_G1_13_2": [
@@ -481,7 +481,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Manor/Features/Chapel_boss_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Fallen Altar"
+      "DisplayName": "Candlemass (+20 Max Life)"
     },
     {
       "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_OpenDoor_01.tdt",
@@ -513,7 +513,7 @@
     {
       "Name": "Metadata/Terrain/Woods/Manor/Features/Chapel_boss_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Fallen Altar"
+      "DisplayName": "Candlemass (+8% Max Life)"
     },
     {
       "Name": "Metadata/Terrain/Woods/Manor/Interior/Features/ThickWall_OpenDoor_01.tdt",
@@ -670,7 +670,7 @@
     {
       "Name": "Metadata/Terrain/Desert/BuriedCity/Features/QueenKabalaRoom_01_meta01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Venom Pit"
+      "DisplayName": "Kabala (+2 Passive)"
     }
   ],
   "C_G2_4_1": [
@@ -692,7 +692,7 @@
     {
       "Name": "Metadata/Terrain/Desert/BuriedCity/Features/QueenKabalaRoom_01_meta01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Venom Pit"
+      "DisplayName": "Kabala (+2 Passive)"
     }
   ],
   "G2_4_2": [
@@ -944,6 +944,12 @@
       "Name": "Metadata/Terrain/Desert/Pillars/Base/PillarBaseWide_StairsUp_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Path of Mourning"
+    },
+    {
+      "Name": "Metadata/Chests/SpireCorpseChest",
+      "ExpectedCount": 1,
+      "DisplayName": "Fallen Dekhara (+2 Passive)",
+      "TargetType": "Entity"
     }
   ],
   "C_G2_8": [
@@ -996,7 +1002,7 @@
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Shrine of the Sisters"
+      "DisplayName": "Sisters of Garukhan (Lightning Res)"
     },
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
@@ -1013,7 +1019,7 @@
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Shrine of the Sisters"
+      "DisplayName": "Sisters of Garukhan (Lightning Res)"
     },
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
@@ -1030,7 +1036,7 @@
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarTopWide_Shrine_01.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Shrine of the Sisters"
+      "DisplayName": "Sisters of Garukhan (Lightning Res)"
     },
     {
       "Name": "Metadata/Terrain/Desert/Pillars/Tops/PillarArena.tdt",
@@ -1104,7 +1110,7 @@
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/Fills/JungleGroundPuddle_04.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Azak Campfire"
+      "DisplayName": "Orok Campfire (Lesser Jeweller's Orb)"
     },
     {
       "Name": "Metadata/Terrain/Jungle/SandsweptMarsh/marsh_exit.tdt",
@@ -1126,7 +1132,7 @@
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/Fills/JungleGroundPuddle_04.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Azak Campfire"
+      "DisplayName": "Orok Campfire (Lesser Jeweller's Orb)"
     },
     {
       "Name": "Metadata/Terrain/Jungle/SandsweptMarsh/marsh_exit.tdt",
@@ -1242,6 +1248,12 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleToWaterways_01_reverse.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Monsters/Quadrilla/Objects/BossRoomMinimapIcon",
+      "ExpectedCount": 1,
+      "DisplayName": "Mighty Silverfist (+2 Passive)",
+      "TargetType": "Entity"
     }
   ],
   "C_G3_3": [
@@ -1259,6 +1271,12 @@
       "Name": "Metadata/Terrain/Jungle/JungleExterior/AreaTransitions/JungleToWaterways_01_reverse.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Infested Barrens"
+    },
+    {
+      "Name": "Metadata/Monsters/Quadrilla/Objects/BossRoomMinimapIcon",
+      "ExpectedCount": 1,
+      "DisplayName": "Mighty Silverfist (+2 Passive)",
+      "TargetType": "Entity"
     }
   ],
   "G3_4": [
@@ -1266,6 +1284,12 @@
       "Name": "Metadata/Terrain/Jungle/AreaTransitions/SnakePit_to_JungleDepths.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Jungle Ruins"
+    },
+    {
+      "Name": "Metadata/Chests/QuestChests/SnakePit/SnakeLadyPotionChest",
+      "ExpectedCount": 1,
+      "DisplayName": "Venom Vial (Pick Bonus)",
+      "TargetType": "Entity"
     }
   ],
   "C_G3_4": [
@@ -1273,6 +1297,12 @@
       "Name": "Metadata/Terrain/Jungle/AreaTransitions/SnakePit_to_JungleDepths.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Jungle Ruins"
+    },
+    {
+      "Name": "Metadata/Chests/QuestChests/SnakePit/SnakeLadyPotionChest",
+      "ExpectedCount": 1,
+      "DisplayName": "Venom Vial (Pick Bonus)",
+      "TargetType": "Entity"
     }
   ],
   "G3_5": [
@@ -1313,7 +1343,7 @@
     {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Oubliette (Fire res)"
+      "DisplayName": "The Oubliette (Fire Res)"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
@@ -1335,7 +1365,7 @@
     {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/dungeon_door_thin_boss.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "The Oubliette (Fire res)"
+      "DisplayName": "The Oubliette (Fire Res)"
     },
     {
       "Name": "Metadata/Terrain/Dungeon/NextFeatures/Machinarium_Entrance_02.tdt",
@@ -1396,7 +1426,7 @@
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Gor-gor Mog"
+      "DisplayName": "Ignagduk, The Bog Witch (+30 Spirit)"
     }
   ],
   "C_G3_7": [
@@ -1408,7 +1438,7 @@
     {
       "Name": "Metadata/Terrain/Jungle/JungleExterior/Bog/Features/BurningWitchArena.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Gor-gor Mog"
+      "DisplayName": "Ignagduk, The Bog Witch (+40 Spirit)"
     }
   ],
   "G3_8": [
@@ -1449,7 +1479,7 @@
     {
       "Name": "Metadata/Terrain/Dungeon/TreasureVault/BossChannel_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Mektul, The Forgemaster"
+      "DisplayName": "Mektul, The Forgemaster (Reforging Bench)"
     },
     {
       "Name": "Metadata/Terrain/Jungle/TreasureVault/BrutalistThickwall/Brutal_Entrance_01.tdt",
@@ -1602,7 +1632,7 @@
     {
       "Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Sacrificial Dagger"
+      "DisplayName": "Sacrificial Dagger (+2 Passive)"
     },
     {
       "Name": "Metadata/Terrain/Jungle/Aggorat/Features/DoryanisSanctumEntrance_01.tdt",
@@ -1629,7 +1659,7 @@
     {
       "Name": "Metadata/Terrain/Jungle/Aggorat/Outerwall/AggoratOuterArena_02.tdt",
       "ExpectedCount": 1,
-      "DisplayName": "Sacrificial Dagger"
+      "DisplayName": "Sacrificial Dagger (+2 Passive)"
     },
     {
       "Name": "Metadata/Terrain/Jungle/Aggorat/Features/DoryanisSanctumEntrance_01.tdt",
