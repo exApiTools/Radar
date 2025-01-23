@@ -254,7 +254,7 @@
       "ExpectedCount": 1,
       "DisplayName": "Embattled Trove"
     }
-  ],  
+  ],
   "C_G1_9": [
     {
       "Name": "Metadata/Terrain/Woods/GraveyardDungeons/Feature/TombBoss_ArenaFloor.tdt",
@@ -266,7 +266,7 @@
       "ExpectedCount": 1,
       "DisplayName": "Embattled Trove"
     }
-  ],    
+  ],
   "G1_11": [
     {
       "Name": "Metadata/Terrain/Woods/AreaTransitions/CliffRoad_Cnr_transition_01.tdt",
@@ -1718,9 +1718,40 @@
   ],
   "MapLostTowers": [
     {
-        "Name": "Metadata/Terrain/Desert/Pillars/Upper/PillarUpper_StairsUp_01.tdt",
-        "ExpectedCount": 1,
-        "DisplayName": "Stairs"
+      "Name": "Metadata/Terrain/Maps/LostTowers/Tiles/PillarArena01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Beacon"
+    }
+  ],
+  "MapSwampTower": [
+    {
+      "Name": "Metadata/Terrain/Maps/SwampTower/Tiles/Lower_Exterior/SwampTower_BasementOuterWall_EndStairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs"
+    },
+    {
+      "Name": "Metadata/Terrain/Maps/SwampTower/Tiles/Mid_Exterior/SwampTower_OuterWallEnd_StairsUp_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs"
+    },
+    {
+      "Name": "Metadata/Terrain/Maps/SwampTower/Tiles/CentrePillar_02.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Stairs"
+    }
+  ],
+  "MapBluff": [
+    {
+      "Name": "Metadata/Terrain/Maps/Bluff/Tiles/Feature/Beacon_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Beacon"
+    }
+  ],
+  "MapMesa": [
+    {
+      "Name": "Metadata/Terrain/Maps/Mesa/Tiles/Peak.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Beacon"
     }
   ]
 }
