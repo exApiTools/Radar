@@ -38,10 +38,18 @@ public partial class Radar
     {
         if (Settings.PathfindingSettings.ShowPathsToTargetsOnMap)
         {
-            var e = Enumerable.Repeat(RainbowColors, 100).SelectMany(x => x).GetEnumerator();
+            var e = RainbowColors.GetEnumerator();
             _getColor = () =>
             {
-                e.MoveNext();
+                if (!e.MoveNext())
+                {
+                    e = RainbowColors.GetEnumerator();
+                    if (!e.MoveNext())
+                    {
+                        return Color.Green;
+                    }
+                }
+
                 return e.Current;
             };
             var pf = new PathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
