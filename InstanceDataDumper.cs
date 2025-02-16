@@ -1,11 +1,19 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using GameOffsets.Native;
 using System.Linq;
 using Newtonsoft.Json;
 
 namespace Radar;
+
+public class TilePosition
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+    public int W { get; set; }
+    public int H { get; set; }
+    public List<string> Tiles { get; set; }
+}
 
 public class OptimizedInstanceData
 {
@@ -13,76 +21,46 @@ public class OptimizedInstanceData
     public int W { get; set; }
     public int H { get; set; }
     public float[] Heights { get; set; }
-    public int[] Walk { get; set; } // Just a simple int array
-    public TileRef[] Tiles { get; set; }
-}
-
-public class TileRef
-{
-    public string T { get; set; }  // Type
-    public int X { get; set; }     // Anchor X
-    public int Y { get; set; }     // Anchor Y
-    public int W { get; set; }     // Width
-    public int H { get; set; }     // Height
+    public int[] Walk { get; set; }
+    public int[] Target { get; set; }
+    public List<TilePosition> Tiles { get; set; }
 }
 
 public partial class Radar
 {
     public void DumpInstanceData(string outputPath)
     {
-        if (_heightData == null || _processedTerrainData == null || _areaDimensions == null)
-        {
-            Console.WriteLine("ERROR: Must be in a game area to dump data");
-            return;
-        }
+        if (_heightData == null || _processedTerrainData == null || _processedTerrainTargetingData == null ||
+            _areaDimensions == null) return;
 
         try
         {
             var dimensions = _areaDimensions.Value;
-            var tgtData = GetTileTargets();
-            var tileRefs = new List<TileRef>();
 
             // Create flattened arrays
             var heights = new float[dimensions.X * dimensions.Y];
             var walk = new int[dimensions.X * dimensions.Y];
+            var target = new int[dimensions.X * dimensions.Y];
 
             // Fill the arrays
             for (var y = 0; y < dimensions.Y && y < _heightData.Length; y++)
+            for (var x = 0; x < dimensions.X && x < _heightData[y].Length; x++)
             {
-                for (var x = 0; x < dimensions.X && x < _heightData[y].Length; x++)
-                {
-                    var index = y * dimensions.X + x;
-                    heights[index] = _heightData[y][x];
-                    walk[index] = _processedTerrainData[y][x];
-                }
+                var index = y * dimensions.X + x;
+                heights[index] = _heightData[y][x];
+                walk[index] = _processedTerrainData[y][x];
+                target[index] = _processedTerrainTargetingData[y][x];
             }
 
-            // Process tiles
-            foreach (var (tileType, positions) in tgtData)
+            // Convert to list of TilePositions
+            var tilePositions = _locationsByPosition.Select(kvp => new TilePosition
             {
-                var tileGroups = positions.GroupBy(pos => new Vector2i(
-                    (pos.X / TileToGridConversion) * TileToGridConversion,
-                    (pos.Y / TileToGridConversion) * TileToGridConversion
-                ));
-
-                foreach (var group in tileGroups)
-                {
-                    var anchorPoint = group.Key;
-
-                    // Skip tiles outside bounds
-                    if (anchorPoint.X >= dimensions.X || anchorPoint.Y >= dimensions.Y)
-                        continue;
-
-                    tileRefs.Add(new TileRef
-                    {
-                        T = tileType,
-                        X = anchorPoint.X,
-                        Y = anchorPoint.Y,
-                        W = TileToGridConversion,
-                        H = TileToGridConversion
-                    });
-                }
-            }
+                X = kvp.Key.X,
+                Y = kvp.Key.Y,
+                W = TileToGridConversion,
+                H = TileToGridConversion,
+                Tiles = kvp.Value
+            }).ToList();
 
             var instanceData = new OptimizedInstanceData
             {
@@ -91,15 +69,15 @@ public partial class Radar
                 H = dimensions.Y,
                 Heights = heights,
                 Walk = walk,
-                Tiles = tileRefs.ToArray()
+                Target = target,
+                Tiles = tilePositions
             };
 
             // Create directory if it doesn't exist
-            var directory = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+            var fullPath = Path.GetFullPath(outputPath);
+            var directory = Path.GetDirectoryName(fullPath);
+
+            if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
             // Serialize and write with indentation for readability
             var json = JsonConvert.SerializeObject(instanceData, new JsonSerializerSettings
@@ -108,14 +86,9 @@ public partial class Radar
             });
 
             File.WriteAllText(outputPath, json);
-
-            Console.WriteLine($"Successfully wrote instance data to {outputPath}");
-            Console.WriteLine($"File size: {new FileInfo(outputPath).Length / 1024.0:F2} KB");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error dumping instance data: {ex.Message}");
-            Console.WriteLine(ex.StackTrace);
         }
     }
 }

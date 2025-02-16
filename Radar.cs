@@ -35,6 +35,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private TerrainData _terrainMetadata;
     private float[][] _heightData;
     private int[][] _processedTerrainData;
+    private int[][] _processedTerrainTargetingData;
     private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
     private List<(Regex, TargetDescription x)> _currentZoneTargetEntityPaths = new();
     private CancellationTokenSource _findPathsCts = new CancellationTokenSource();
@@ -72,8 +73,13 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 .ToDictionary(x => x.Key, x => x.ToList()));
             _areaDimensions = GameController.IngameState.Data.AreaDimensions;
             _processedTerrainData = GameController.IngameState.Data.RawPathfindingData;
+            _processedTerrainTargetingData = GameController.IngameState.Data.RawTerrainTargetingData;
 
-            DumpInstanceData($"{DirectoryFullName}\\{GameController.Area.CurrentArea.Area.RawName}_data.json");
+            if (Settings.AutoDumpInstanceOnAreaChange)
+            {
+                DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}.json");
+            }
+
             GenerateMapTexture();
             _clusteredTargetLocations = ClusterTargets();
             StartPathFinding();
@@ -162,6 +168,11 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
     public override void Render()
     {
+        if (Settings.ManuallyDumpInstance.PressedOnce())
+        {
+            DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}.json");
+        }
+
         var ingameUi = GameController.Game.IngameState.IngameUi;
         if (!Settings.Debug.IgnoreFullscreenPanels &&
             ingameUi.FullscreenPanels.Any(x => x.IsVisible))

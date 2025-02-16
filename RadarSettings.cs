@@ -1,4 +1,5 @@
-﻿using ExileCore.Shared.Attributes;
+﻿using System.Windows.Forms;
+using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
 using Newtonsoft.Json;
@@ -64,6 +65,8 @@ public class RadarSettings : ISettings
 {
     [JsonIgnore]
     public ButtonNode Reload { get; set; } = new ButtonNode();
+    public ToggleNode AutoDumpInstanceOnAreaChange { get; set; } = new ToggleNode(false);
+    public HotkeyNode ManuallyDumpInstance { get; set; } = new HotkeyNode(Keys.None);
 
     public ToggleNode Enable { get; set; } = new ToggleNode(true);
     public RangeNode<float> CustomScale { get; set; } = new RangeNode<float>(1, 0.1f, 10);
