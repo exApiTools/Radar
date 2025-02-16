@@ -54,6 +54,8 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         GameController.PluginBridge.SaveMethod("Radar.ClusterTarget",
             (string targetName, int expectedCount) => ClusterTarget(targetName, expectedCount));
 
+        Settings.ManuallyDumpInstance.OnValueChanged += () => { Input.RegisterKey(Settings.ManuallyDumpInstance); };
+
         return true;
     }
 
