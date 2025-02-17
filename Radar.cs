@@ -80,13 +80,21 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
             if (Settings.AutoDumpInstanceOnAreaChange)
             {
-                DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}.json");
+                DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json");
             }
 
             GenerateMapTexture();
             _clusteredTargetLocations = ClusterTargets();
             StartPathFinding();
         }
+    }
+
+    private static string SanitizeAreaName(string name)
+    {
+        return name.Replace(" ", "_")
+            .Replace(":", "")
+            .Replace("/", "")
+            .Replace("\\", "");
     }
 
     public override void DrawSettings()
