@@ -13,6 +13,7 @@ public class DebugSettings
 {
     public ToggleNode DrawHeightMap { get; set; } = new ToggleNode(false);
     public ToggleNode DisableHeightAdjust { get; set; } = new ToggleNode(false);
+    public ToggleNode AlternativeEdgeMethod { get; set; } = new ToggleNode(false);
     public ToggleNode SkipNeighborFill { get; set; } = new ToggleNode(false);
     public ToggleNode SkipEdgeDetector { get; set; } = new ToggleNode(false);
     public ToggleNode SkipRecoloring { get; set; } = new ToggleNode(false);
