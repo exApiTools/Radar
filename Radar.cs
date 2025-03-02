@@ -181,7 +181,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     {
         if (Settings.ManuallyDumpInstance.PressedOnce())
         {
-            DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}.json");
+            DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json");
         }
 
         var ingameUi = GameController.Game.IngameState.IngameUi;
