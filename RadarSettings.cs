@@ -14,9 +14,10 @@ public class DebugSettings
     public ToggleNode DrawHeightMap { get; set; } = new ToggleNode(false);
     public ToggleNode DisableHeightAdjust { get; set; } = new ToggleNode(false);
     public ToggleNode AlternativeEdgeMethod { get; set; } = new ToggleNode(false);
-    public ToggleNode SkipNeighborFill { get; set; } = new ToggleNode(false);
-    public ToggleNode SkipEdgeDetector { get; set; } = new ToggleNode(false);
-    public ToggleNode SkipRecoloring { get; set; } = new ToggleNode(false);
+    [ConditionalDisplay(nameof(AlternativeEdgeMethod))]
+    public AlternativeEdge AlternativeEdgeSettings { get; set; } = new AlternativeEdge();
+    [ConditionalDisplay(nameof(AlternativeEdgeMethod), false)]
+    public CurrentEdge StandardEdgeSettings { get; set; } = new CurrentEdge();
     public ToggleNode DisableDrawRegionLimiting { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreLargePanels { get; set; } = new ToggleNode(false);
@@ -34,6 +35,22 @@ public class WorldPathSettings
     public ToggleNode OffsetPaths { get; set; } = new ToggleNode(true);
     public RangeNode<float> PathThickness { get; set; } = new RangeNode<float>(1, 1, 20);
     public RangeNode<int> DrawEveryNthSegment { get; set; } = new RangeNode<int>(1, 1, 10);
+}
+
+[Submenu]
+public class AlternativeEdge
+{
+    public RangeNode<float> OutlineBlurSigma { get; set; } = new RangeNode<float>(0.438f, 0f, 20f);
+    public RangeNode<float> OutlineTransitionThreshold { get; set; } = new RangeNode<float>(0.070f, 0f, 1f);
+    public RangeNode<float> OutlineFeatherWidth { get; set; } = new RangeNode<float>(0.070f, 0f, 1f);
+}
+
+[Submenu]
+public class CurrentEdge
+{
+    public ToggleNode SkipNeighborFill { get; set; } = new ToggleNode(false);
+    public ToggleNode SkipEdgeDetector { get; set; } = new ToggleNode(false);
+    public ToggleNode SkipRecoloring { get; set; } = new ToggleNode(false);
 }
 
 [Submenu]
