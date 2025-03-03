@@ -42,6 +42,12 @@ public partial class Radar
         {
             if (Settings.Debug.AlternativeEdgeMethod)
             {
+                static float Clamp(float value, float min, float max) => MathF.Min(MathF.Max(value, min), max);
+
+                static Vector4 Lerp(Vector4 a, Vector4 b, float t) => a + t * (b - a);
+
+                using var binaryMap = new Image<L8>(configuration, maxX, maxY);
+
                 if (!Settings.Debug.DisableHeightAdjust)
                     Parallel.For(
                         0, maxY, y =>
@@ -53,39 +59,50 @@ public partial class Radar
 
                                 var cellData = gridHeightData[y][x];
                                 var heightOffset = (int)(cellData / GridToWorldMultiplier / 2);
-                                var offsetX = x - heightOffset;
-                                var offsetY = y - heightOffset;
+                                var adjustedX = x - heightOffset;
+                                var adjustedY = y - heightOffset;
 
-                                for (var dx = -1; dx <= 1; dx++)
-                                for (var dy = -1; dy <= 1; dy++)
-                                {
-                                    var posX = offsetX + dx;
-                                    var posY = offsetY + dy;
-                                    if (posX >= 0 && posX < maxX && posY >= 0 && posY < maxY)
-                                        image[posX, posY] = new Rgba32(Settings.TerrainColor.Value.ToImguiVec4());
-                                }
+                                if (adjustedX >= 0 && adjustedX < maxX && adjustedY >= 0 && adjustedY < maxY)
+                                    binaryMap[adjustedX, adjustedY] = new L8(255);
                             }
                         });
+
                 else
                     Parallel.For(
                         0, maxY, y =>
                         {
                             for (var x = 0; x < maxX; x++)
-                            {
                                 if (_processedTerrainData[y][x] != 1)
-                                    continue;
-
-                                for (var dx = -1; dx <= 1; dx++)
-                                for (var dy = -1; dy <= 1; dy++)
-                                {
-                                    var posX = x + dx;
-                                    var posY = y + dy;
-
-                                    if (posX >= 0 && posX < maxX && posY >= 0 && posY < maxY)
-                                        image[posX, posY] = new Rgba32(Settings.TerrainColor.Value.ToImguiVec4());
-                                }
-                            }
+                                    binaryMap[x, y] = new L8(255);
                         });
+
+                var blurSigma = Settings.Debug.AlternativeEdgeSettings.OutlineBlurSigma.Value;
+                binaryMap.Mutate(ctx => ctx.GaussianBlur(blurSigma));
+
+                var eps = Settings.Debug.AlternativeEdgeSettings.OutlineTransitionThreshold.Value;
+                var aaWidth = Settings.Debug.AlternativeEdgeSettings.OutlineFeatherWidth.Value;
+
+                Parallel.For(
+                    0, maxY, y =>
+                    {
+                        for (var x = 0; x < maxX; x++)
+                        {
+                            var t = binaryMap[x, y].PackedValue / 255f;
+
+                            var walkableToEdge = Clamp((t - (eps - aaWidth)) / aaWidth, 0f, 1f);
+                            var edgeToUnwalkable = Clamp((t - (1f - eps)) / aaWidth, 0f, 1f);
+
+                            var walkableColor = new Vector4(1f, 1f, 1f, 0.00f);
+                            var outlineTarget = Settings.TerrainColor.Value.ToVector4().ToVector4Num();
+
+                            var color = Lerp(walkableColor, outlineTarget, walkableToEdge);
+                            color = Lerp(color, color with { W = 0f }, edgeToUnwalkable);
+
+                            color = new Vector4(Clamp(color.X, 0f, 1f), Clamp(color.Y, 0f, 1f), Clamp(color.Z, 0f, 1f), Clamp(color.W, 0f, 1f));
+
+                            image[x, y] = new Rgba32(color.X, color.Y, color.Z, color.W);
+                        }
+                    });
             }
             else
             {
@@ -123,7 +140,7 @@ public partial class Radar
                     });
                 }
 
-                if (!Settings.Debug.SkipNeighborFill)
+                if (!Settings.Debug.StandardEdgeSettings.SkipNeighborFill)
                 {
                     Parallel.For(0, maxY, y =>
                     {
@@ -157,14 +174,14 @@ public partial class Radar
                     });
                 }
 
-                if (!Settings.Debug.SkipEdgeDetector)
+                if (!Settings.Debug.StandardEdgeSettings.SkipEdgeDetector)
                 {
                     var edgeDetector = new EdgeDetectorProcessor(EdgeDetectorKernel.Laplacian5x5, false)
                        .CreatePixelSpecificProcessor(configuration, image, image.Bounds());
                     edgeDetector.Execute();
                 }
 
-                if (!Settings.Debug.SkipRecoloring)
+                if (!Settings.Debug.StandardEdgeSettings.SkipRecoloring)
                 {
                     image.Mutate(configuration, c => c.ProcessPixelRowsAsVector4((row, p) =>
                     {

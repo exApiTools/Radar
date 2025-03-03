@@ -129,12 +129,15 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         Settings.MaximumPathCount.OnValueChanged += (_, _) => { Core.MainRunner.Run(new Coroutine(RestartPathFinding, new WaitTime(0), this, "RestartPathfinding", false, true)); };
         Settings.TerrainColor.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.DrawHeightMap.OnValueChanged += (_, _) => { GenerateMapTexture(); };
-        Settings.Debug.SkipEdgeDetector.OnValueChanged += (_, _) => { GenerateMapTexture(); };
-        Settings.Debug.SkipNeighborFill.OnValueChanged += (_, _) => { GenerateMapTexture(); };
-        Settings.Debug.SkipRecoloring.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.StandardEdgeSettings.SkipEdgeDetector.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.StandardEdgeSettings.SkipNeighborFill.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.StandardEdgeSettings.SkipRecoloring.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.DisableHeightAdjust.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.MaximumMapTextureDimension.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.AlternativeEdgeMethod.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.AlternativeEdgeSettings.OutlineBlurSigma.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.AlternativeEdgeSettings.OutlineTransitionThreshold.OnValueChanged += (_, _) => { GenerateMapTexture(); };
+        Settings.Debug.AlternativeEdgeSettings.OutlineFeatherWidth.OnValueChanged += (_, _) => { GenerateMapTexture(); };
     }
 
     public override void EntityAdded(Entity entity)
