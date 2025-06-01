@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExileCore2.PoEMemory.Components;
-using ExileCore2.PoEMemory.MemoryObjects;
-using ExileCore2.Shared.Helpers;
-using GameOffsets2;
-using GameOffsets2.Native;
+using ExileCore.PoEMemory.Components;
+using ExileCore.PoEMemory.MemoryObjects;
+using ExileCore.Shared.Helpers;
+using GameOffsets;
+using GameOffsets.Native;
 using Newtonsoft.Json;
+using SharpDX;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Radar;
@@ -104,7 +104,7 @@ public partial class Radar
                 Func<Color> customColorFunc = null;
                 if (targetDescription.Color != null)
                 {
-                    var color = ConvertHelper.FromAbgr(uint.Parse(targetDescription.Color, NumberStyles.HexNumber));
+                    var color = Color.FromAbgr(uint.Parse(targetDescription.Color, NumberStyles.HexNumber));
                     customColorFunc = () => color;
                 }
 

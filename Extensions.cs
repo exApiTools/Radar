@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
-using ExileCore2.PoEMemory.Components;
-using GameOffsets2.Native;
+using ExileCore.PoEMemory.Components;
+using GameOffsets.Native;
 
 namespace Radar;
 
@@ -10,7 +10,7 @@ public static class Extensions
 {
     public static Vector3 GridPos(this Render render)
     {
-        return render.Pos / Radar.GridToWorldMultiplier;
+        return render.PosNum / Radar.GridToWorldMultiplier;
     }
 
     public static Vector2i Truncate(this Vector2 v)

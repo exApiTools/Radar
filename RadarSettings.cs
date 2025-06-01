@@ -1,8 +1,9 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
-using ExileCore2.Shared.Attributes;
-using ExileCore2.Shared.Interfaces;
-using ExileCore2.Shared.Nodes;
+using ExileCore.Shared.Attributes;
+using ExileCore.Shared.Helpers;
+using ExileCore.Shared.Interfaces;
+using ExileCore.Shared.Nodes;
 using Newtonsoft.Json;
 
 namespace Radar;
@@ -28,7 +29,7 @@ public class WorldPathSettings
     public ToggleNode ShowPathsToTargets { get; set; } = new ToggleNode(true);
     public ToggleNode ShowPathsToTargetsOnlyWithClosedMap { get; set; } = new ToggleNode(true);
     public ToggleNode UseRainbowColorsForPaths { get; set; } = new ToggleNode(true);
-    public ColorNode DefaultPathColor { get; set; } = new ColorNode(Color.Red);
+    public ColorNode DefaultPathColor { get; set; } = new ColorNode(Color.Red.ToSharpDx());
     public ToggleNode OffsetPaths { get; set; } = new ToggleNode(true);
     public RangeNode<float> PathThickness { get; set; } = new RangeNode<float>(1, 1, 20);
     public RangeNode<int> DrawEveryNthSegment { get; set; } = new RangeNode<int>(1, 1, 10);
@@ -46,7 +47,7 @@ public class PathfindingSettings
     public TextNode TargetNameFilter { get; set; } = new TextNode("");
 
     public ToggleNode ShowPathsToTargetsOnMap { get; set; } = new ToggleNode(true);
-    public ColorNode DefaultMapPathColor { get; set; } = new ColorNode(Color.Green);
+    public ColorNode DefaultMapPathColor { get; set; } = new ColorNode(Color.Green.ToSharpDx());
     public ToggleNode UseRainbowColorsForMapPaths { get; set; } = new ToggleNode(true);
     public ToggleNode ShowAllTargets { get; set; } = new ToggleNode(false);
 
@@ -57,7 +58,7 @@ public class PathfindingSettings
     public ToggleNode IncludeTilePathsAsTargets { get; set; } = new ToggleNode(true);
     public ToggleNode ShowSelectedTargets { get; set; } = new ToggleNode(true);
     public ToggleNode EnableTargetNameBackground { get; set; } = new ToggleNode(true);
-    public ColorNode TargetNameColor { get; set; } = new ColorNode(Color.Violet);
+    public ColorNode TargetNameColor { get; set; } = new ColorNode(Color.Violet.ToSharpDx());
     public WorldPathSettings WorldPathSettings { get; set; } = new WorldPathSettings();
 }
 
@@ -70,7 +71,7 @@ public class RadarSettings : ISettings
     public ToggleNode Enable { get; set; } = new ToggleNode(true);
     public RangeNode<float> CustomScale { get; set; } = new RangeNode<float>(1, 0.1f, 10);
     public ToggleNode DrawWalkableMap { get; set; } = new ToggleNode(true);
-    public ColorNode TerrainColor { get; set; } = new ColorNode(Color.FromArgb(150, 150, 150, 150));
+    public ColorNode TerrainColor { get; set; } = new ColorNode(Color.FromArgb(150, 150, 150, 150).ToSharpDx());
     public RangeNode<int> MaximumMapTextureDimension { get; set; } = new RangeNode<int>(4096, 100, 4096);
     public RangeNode<int> MaximumPathCount { get; set; } = new RangeNode<int>(1000, 0, 1000);
     public PathfindingSettings PathfindingSettings { get; set; } = new PathfindingSettings();

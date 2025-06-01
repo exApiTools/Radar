@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using GameOffsets2.Native;
+using GameOffsets.Native;
 
 namespace Radar;
 
