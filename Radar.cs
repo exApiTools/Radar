@@ -106,13 +106,13 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private static readonly List<SharpDX.Color> RainbowColors = new List<Color>
     {
         Color.Red,
-        Color.Green,
-        Color.Blue,
-        Color.Yellow,
-        Color.Violet,
-        Color.Orange,
+        Color.LightGreen,
         Color.White,
+        Color.Yellow,
         Color.LightBlue,
+        Color.Violet,
+        Color.Blue,
+        Color.Orange,
         Color.Indigo,
     }.Select(x => x.ToSharpDx()).ToList();
 
