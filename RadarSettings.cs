@@ -20,6 +20,7 @@ public class DebugSettings
     public CurrentEdge StandardEdgeSettings { get; set; } = new CurrentEdge();
     public ToggleNode DisableDrawRegionLimiting { get; set; } = new ToggleNode(false);
     public ToggleNode IgnoreFullscreenPanels { get; set; } = new ToggleNode(false);
+    public ToggleNode RenderInPeacefulZones { get; set; } = new ToggleNode(true);
     public ToggleNode IgnoreLargePanels { get; set; } = new ToggleNode(false);
     public RangeNode<int> MapCenterOffsetX { get; set; } = new RangeNode<int>(0, -1000, 1000);
     public RangeNode<int> MapCenterOffsetY { get; set; } = new RangeNode<int>(0, -1000, 1000);

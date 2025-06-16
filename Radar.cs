@@ -188,6 +188,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json");
         }
 
+        if (!Settings.Debug.RenderInPeacefulZones && GameController.Area.CurrentArea.IsPeaceful)
+            return;
+
         var ingameUi = GameController.Game.IngameState.IngameUi;
         if (!Settings.Debug.IgnoreFullscreenPanels &&
             ingameUi.FullscreenPanels.Any(x => x.IsVisible))
