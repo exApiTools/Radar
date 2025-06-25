@@ -2253,7 +2253,7 @@
     },
     {
       "Name": "entrance_upper",
-      "ExpectedCount": 1,
+      "ExpectedCount": 2,
       "DisplayName": "Transition"
     },
     {
