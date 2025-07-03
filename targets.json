@@ -2280,5 +2280,13 @@
       "DisplayName": "Escape route",
       "TargetType": "Entity"
     }
+  ],
+  "Map*": [
+    {
+      "Name": "Metadata/Terrain/Leagues/Settlers/Objects/VerisiumBossSubAreaEntrance",
+      "ExpectedCount": 1,
+      "DisplayName": "Starfall Crater",
+      "TargetType": "Entity"
+    }
   ]
 }
