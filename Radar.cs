@@ -55,8 +55,8 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         GameController.PluginBridge.SaveMethod("Radar.ClusterTarget",
             (string targetName, int expectedCount) => ClusterTarget(targetName, expectedCount));
 
-        Input.RegisterKey(Settings.ManuallyDumpInstance);
-        Settings.ManuallyDumpInstance.OnValueChanged += () => { Input.RegisterKey(Settings.ManuallyDumpInstance); };
+        Input.RegisterKey(Settings.ManuallyDumpInstance.Value);
+        Settings.ManuallyDumpInstance.OnValueChanged += () => { Input.RegisterKey(Settings.ManuallyDumpInstance.Value); };
         return true;
     }
 
@@ -82,7 +82,10 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
             if (Settings.AutoDumpInstanceOnAreaChange)
             {
-                DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json");
+                Task.Run(() =>
+                {
+                    DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json.gz");
+                });
             }
 
             GenerateMapTexture();
@@ -187,7 +190,10 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     {
         if (Settings.ManuallyDumpInstance.PressedOnce())
         {
-            DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json");
+            Task.Run(() =>
+            {
+                DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json.gz");
+            });
         }
 
         if (!Settings.Debug.RenderInPeacefulZones && GameController.Area.CurrentArea.IsPeaceful)

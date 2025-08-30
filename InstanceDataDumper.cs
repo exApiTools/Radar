@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.IO.Compression;
 
 namespace Radar;
 
@@ -82,20 +83,23 @@ public partial class Radar
             var directory = Path.GetDirectoryName(fullPath);
 
             if (!string.IsNullOrEmpty(directory))
-            {
                 Directory.CreateDirectory(directory);
-            }
 
-            // Serialize and write with indentation for readability
-            var json = JsonConvert.SerializeObject(instanceData, new JsonSerializerSettings
-            {
-                Formatting = Formatting.None
-            });
+            // Serialize
+            var json = JsonConvert.SerializeObject(
+                instanceData, new JsonSerializerSettings
+                {
+                    Formatting = Formatting.None
+                });
 
-            File.WriteAllText(outputPath, json);
+            using var fileStream = File.Create(fullPath);
+            using var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
+            using var writer = new StreamWriter(gzipStream);
+            writer.Write(json);
         }
         catch (Exception ex)
         {
+            // ignored
         }
     }
 }
