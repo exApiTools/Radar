@@ -92,6 +92,8 @@ public class RadarSettings : ISettings
     public ToggleNode DrawWalkableMap { get; set; } = new ToggleNode(true);
     public ColorNode TerrainColor { get; set; } = new ColorNode(Color.FromArgb(150, 150, 150, 150).ToSharpDx());
     public RangeNode<int> MaximumMapTextureDimension { get; set; } = new RangeNode<int>(4096, 100, 4096);
+    [Menu(null, "Reload to see the effect")]
+    public ToggleNode ClearTriggerableBlockades { get; set; } = new ToggleNode(true);
     public RangeNode<int> MaximumPathCount { get; set; } = new RangeNode<int>(1000, 0, 1000);
     public PathfindingSettings PathfindingSettings { get; set; } = new PathfindingSettings();
     public DebugSettings Debug { get; set; } = new DebugSettings();

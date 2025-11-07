@@ -75,7 +75,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 .ToLookup(x => x.y, x => x.Key)
                 .ToDictionary(x => x.Key, x => x.ToList()));
             _areaDimensions = GameController.IngameState.Data.AreaDimensions;
-            _processedTerrainData = GameController.IngameState.Data.RawPathfindingData;
+            _processedTerrainData = Settings.ClearTriggerableBlockades 
+                ? GameController.IngameState.Data.GetClearedPathfindingData() 
+                : GameController.IngameState.Data.RawPathfindingData;
             _processedTerrainTargetingData = GameController.IngameState.Data.RawTerrainTargetingData;
 
             if (Settings.AutoDumpInstanceOnAreaChange)
