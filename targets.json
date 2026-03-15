@@ -44,6 +44,11 @@
       "Name": "Metadata/Terrain/Woods/Woods/AzmeriLeague/Features/arenaTransition_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Boss stronghold"
+    },
+    {
+      "Name": "Metadata/Terrain/Woods/Woods/AzmeriLeague/hedgemaze/thickwall_cv_thinwall_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Exit Maze"
     }
   ],
   "2_6_2": [
