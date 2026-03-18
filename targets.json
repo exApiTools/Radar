@@ -2193,6 +2193,41 @@
       "DisplayName": "The Chamber Of Innocence"
     }
   ],
+  "MapWorldsCitadel": [
+    {
+      "Name": "side_entrance",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
+  "MapWorldsFortress": [
+    {
+      "Name": "robot_arena",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
+  "MapWorldsSanctuary": [
+    {
+      "Name": "Metadata/Terrain/Theopolis/Innocence/Stairs/Innocence_stairs_straight_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
+  "MapWorldsZiggurat": [
+    {
+      "Name": "transition",
+      "ExpectedCount": 2,
+      "DisplayName": "Arena"
+    }
+  ],
+  "MapWorldsAbomination": [
+    {
+      "Name": "boss_arena",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena"
+    }
+  ],
   "*_Labyrinth_*": [
     {
       "Name": "entry",
