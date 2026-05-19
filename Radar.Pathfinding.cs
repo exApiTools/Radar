@@ -234,17 +234,25 @@ public partial class Radar
         return tileMap;
     }
 
-    private IReadOnlyCollection<Vector2i> GetLocationsFromTilePattern(string tilePattern)
+    private IReadOnlyCollection<Vector2i> GetLocationsFromTilePattern(string tilePattern, string[] rooms)
     {
         var regex = tilePattern.ToLikeRegex();
-        return _allTargetLocations.Where(x => regex.IsMatch(x.Key)).SelectMany(x => x.Value).ToList();
+        var locations = _allTargetLocations.Where(x => regex.IsMatch(x.Key)).SelectMany(x => x.Value).ToList();
+        if (rooms != null)
+        {
+            var roomRegexes = rooms.Select(x => x.ToLikeRegex());
+            var filteredRooms = _rooms.Where(x => roomRegexes.Any(r => r.IsMatch(x.Key))).SelectMany(x => x.Value).ToList();
+            locations = locations.Where(x => filteredRooms.Any(r => x.X >= r.MinX && x.X <= r.MaxX && x.Y >= r.MinY && x.Y <= r.MaxY)).ToList();
+        }
+
+        return locations;
     }
 
     private TargetLocations ClusterTarget(TargetDescription target)
     {
         var expectedCount = target.ExpectedCount;
         var targetName = target.Name;
-        var locations = ClusterTarget(targetName, expectedCount);
+        var locations = ClusterTarget(targetName, target.Rooms, expectedCount);
         if (locations == null) return null;
         return new TargetLocations
         {
@@ -253,9 +261,9 @@ public partial class Radar
         };
     }
 
-    private Vector2[] ClusterTarget(string targetName, int expectedCount)
+    private Vector2[] ClusterTarget(string targetName, string[] rooms, int expectedCount)
     {
-        var tileList = GetLocationsFromTilePattern(targetName);
+        var tileList = GetLocationsFromTilePattern(targetName, rooms);
         if (tileList is not { Count: > 0 })
         {
             return null;
