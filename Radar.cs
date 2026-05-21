@@ -55,7 +55,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     {
         GameController.PluginBridge.SaveMethod("Radar.LookForRoute",
             (Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken) =>
-                AddRoute(target, null, callback, cancellationToken));
+                AddRoute(target, callback, cancellationToken));
         GameController.PluginBridge.SaveMethod("Radar.ClusterTarget",
             (string targetName, int expectedCount) => ClusterTarget(targetName, null, expectedCount));
 
@@ -70,7 +70,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         StopPathFinding();
         if (GameController.Game.IsInGameState || GameController.Game.IsEscapeState)
         {
-            _targetDescriptionsInArea = GetTargetDescriptionsInArea().DistinctBy(x => x.Name).ToDictionary(x => x.Name);
+            _targetDescriptionsInArea = GetTargetDescriptionsInArea().DistinctBy(x => x.EqualityId).ToDictionary(x => x.EqualityId);
             _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).DistinctBy(x => x.Name).Select(x=>(x.Name.ToLikeRegex(), x)).ToList();
             _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
             _heightData = GameController.IngameState.Data.RawTerrainHeightData;
@@ -165,20 +165,20 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             {
                 bool alreadyContains = false;
                 var truncatedPos = positioned.GridPosNum.Truncate();
-                _allTargetLocations.AddOrUpdate(targetDescription.Name, _ => [truncatedPos],
+                _allTargetLocations.AddOrUpdate(path, _ => [truncatedPos],
                     // ReSharper disable once AssignmentInConditionalExpression
                     (_, l) => (alreadyContains = l.Contains(truncatedPos)) ? l : [..l, truncatedPos]);
-                _locationsByPosition.AddOrUpdate(truncatedPos, _ => [targetDescription.Name],
-                    (_, l) => l.Contains(targetDescription.Name) ? l : [..l, targetDescription.Name]);
+                _locationsByPosition.AddOrUpdate(truncatedPos, _ => [path],
+                    (_, l) => l.Contains(path) ? l : [..l, path]);
                 if (!alreadyContains)
                 {
-                    var oldValue = _clusteredTargetLocations.GetValueOrDefault(targetDescription.Name);
-                    var newValue = _clusteredTargetLocations.AddOrUpdate(targetDescription.Name,
-                        _ => ClusterTarget(_targetDescriptionsInArea[targetDescription.Name]),
-                        (_, _) => ClusterTarget(_targetDescriptionsInArea[targetDescription.Name]));
+                    var oldValue = _clusteredTargetLocations.GetValueOrDefault(targetDescription.EqualityId);
+                    var newValue = _clusteredTargetLocations.AddOrUpdate(targetDescription.EqualityId,
+                        _ => ClusterTarget(_targetDescriptionsInArea[targetDescription.EqualityId]),
+                        (_, _) => ClusterTarget(_targetDescriptionsInArea[targetDescription.EqualityId]));
                     foreach (var newLocation in newValue.Locations.Except(oldValue?.Locations ?? []))
                     {
-                        AddRoute(newLocation, targetDescription, entity);
+                        AddRoute(newLocation, [targetDescription], entity);
                     }
                 }
             }

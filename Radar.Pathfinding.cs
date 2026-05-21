@@ -54,16 +54,16 @@ public partial class Radar
             };
             var pf = new PathFinder(_processedTerrainData, new[] { 1, 2, 3, 4, 5 });
             _addRouteAction = (point, callback, cancellationToken) => Task.Run(() => FindPath(pf, point, callback, cancellationToken), cancellationToken);
-            foreach (var (location, target) in _clusteredTargetLocations
+            foreach (var group in _clusteredTargetLocations
                          .SelectMany(x => x.Value.Locations.Select(loc=>(loc, x.Value.Target)))
-                         .DistinctBy(x => x.loc))
+                         .GroupBy(x => x.loc, x=>x.Target))
             {
-                AddRoute(location, target, null);
+                AddRoute(group.Key, group.ToList(), null);
             }
         }
     }
 
-    private void AddRoute(Vector2 target, TargetDescription targetDescription, Entity entity)
+    private void AddRoute(Vector2 target, List<TargetDescription> targetDescriptions, Entity entity)
     {
         var color = _getColor();
 
@@ -78,7 +78,7 @@ public partial class Radar
         var routes = _routes;
 
         var cancellationToken = _findPathsCts.Token;
-        if (targetDescription.TargetType == TargetType.Entity && entity != null)
+        if (targetDescriptions.Any(x => x.TargetType == TargetType.Entity) && entity != null)
         {
             var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cancellationToken = cts.Token;
@@ -97,14 +97,14 @@ public partial class Radar
             _ = CheckEntity();
         }
 
-        AddRoute(target, targetDescription, path =>
+        AddRoute(target, path =>
         {
             if (path != null)
             {
                 Func<Color> customColorFunc = null;
-                if (targetDescription.Color != null)
+                if (targetDescriptions.FirstOrDefault(x => x.Color != null)?.Color is { } colorText)
                 {
-                    var color = Color.FromAbgr(uint.Parse(targetDescription.Color, NumberStyles.HexNumber));
+                    var color = Color.FromAbgr(uint.Parse(colorText, NumberStyles.HexNumber));
                     customColorFunc = () => color;
                 }
 
@@ -119,7 +119,7 @@ public partial class Radar
         }, cancellationToken);
     }
 
-    private Task AddRoute(Vector2 target, TargetDescription targetDescription, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
+    private Task AddRoute(Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken)
     {
         if (_addRouteAction == null)
         {
@@ -228,7 +228,7 @@ public partial class Radar
             var locations = ClusterTarget(target);
             if (locations != null)
             {
-                tileMap[target.Name] = locations;
+                tileMap[target.EqualityId] = locations;
             }
         });
         return tileMap;
@@ -250,9 +250,9 @@ public partial class Radar
 
     private TargetLocations ClusterTarget(TargetDescription target)
     {
-        var expectedCount = target.ExpectedCount;
-        var targetName = target.Name;
-        var locations = ClusterTarget(targetName, target.Rooms, expectedCount);
+        var locations = (target.Alternatives ?? []).Prepend(target)
+            .Select(tAlt => ClusterTarget(tAlt.Name, tAlt.Rooms, tAlt.ExpectedCount))
+            .FirstOrDefault(x => x != null);
         if (locations == null) return null;
         return new TargetLocations
         {
