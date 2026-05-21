@@ -318,7 +318,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             var playerRender = player?.GetComponent<Render>();
             if (playerRender == null)
                 return;
-            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.PosNum with { Z = playerRender.RenderStruct.Height });
+            var initPos = GameController.IngameState.Camera.WorldToScreen(playerRender.PosNum with { Z = playerRender.UnclampedHeight });
             foreach (var (route, offsetAmount) in _routes.Values
                          .GroupBy(x => x.Path.Count < 2 ? 0 : (x.Path[1] - x.Path[0]) switch { var diff => Math.Atan2(diff.Y, diff.X) })
                          .SelectMany(group => group.Select((route, i) => (route, i - group.Count() / 2.0f + 0.5f))))
@@ -379,7 +379,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         if (playerRender == null)
             return;
         var rectangleF = new RectangleF(-playerRender.GridPos().X, -playerRender.GridPos().Y, _areaDimensions.Value.X, _areaDimensions.Value.Y);
-        var playerHeight = -playerRender.RenderStruct.Height;
+        var playerHeight = -playerRender.UnclampedHeight;
         var p1 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Top), playerHeight);
         var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
         var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
@@ -395,7 +395,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         if (playerRender == null)
             return;
         var playerPosition = new Vector2(playerRender.GridPos().X, playerRender.GridPos().Y);
-        var playerHeight = -playerRender.RenderStruct.Height;
+        var playerHeight = -playerRender.UnclampedHeight;
         var ithElement = 0;
         if (Settings.PathfindingSettings.ShowPathsToTargetsOnMap)
         {
