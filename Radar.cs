@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -257,6 +257,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         }
 
         DrawWorldPaths(largeMap);
+        DrawPathLegend();
         ImGui.End();
         DrawRooms();
     }
@@ -353,6 +354,57 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             }
         }
     }
+
+	private void DrawPathLegend()
+	{
+	    if (!Settings.PathfindingSettings.ShowPathLegend) return;
+	    if (_clusteredTargetLocations.Count == 0) return;
+	
+	    var padding = 10f;
+	    var lineHeight = 22f;
+	    var boxSize = 14f;
+	    var legendWidth = 220f;
+	    var startX = Settings.PathfindingSettings.PathLegendPositionX.Value;
+	    var startY = Settings.PathfindingSettings.PathLegendPositionY.Value;
+	
+	    // Match each target to its correct route color via location
+	    var entries = _clusteredTargetLocations.Values
+	        .SelectMany(t => t.Locations.Select(loc => (t.DisplayName, loc)))
+	        .Select(x => {
+	            var routeKey = new Vector2(x.loc.X, x.loc.Y);
+	            var color = _routes.TryGetValue(routeKey, out var route) 
+	                ? route.MapColor() 
+	                : Color.White.ToSharpDx();
+	            return (x.DisplayName, color);
+	        })
+	        .DistinctBy(x => x.DisplayName)
+	        .ToList();
+	
+	    if (entries.Count == 0) return;
+	
+	    var bgHeight = padding * 2 + entries.Count * lineHeight;
+	
+	    _backGroundWindowPtr.AddRectFilled(
+	        new Vector2(startX - padding, startY - padding),
+	        new Vector2(startX + legendWidth, startY + bgHeight),
+	        Color.FromArgb(180, 0, 0, 0).ToImgui());
+	
+	    for (var i = 0; i < entries.Count; i++)
+	    {
+	        var (name, color) = entries[i];
+	        var y = startY + i * lineHeight;
+	
+	        _backGroundWindowPtr.AddRectFilled(
+	            new Vector2(startX, y + 2),
+	            new Vector2(startX + boxSize, y + boxSize + 2),
+	            color.ToImgui());
+	
+	        _backGroundWindowPtr.AddText(
+	            new Vector2(startX + boxSize + 8, y),
+	            Color.White.ToImgui(),
+	            name);
+	    }
+	}
 
     private void DrawBox(Vector2 p0, Vector2 p1, SharpDX.Color color)
     {

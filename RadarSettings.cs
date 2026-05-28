@@ -80,6 +80,9 @@ public class PathfindingSettings
     public ToggleNode EnableTargetNameBackground { get; set; } = new ToggleNode(true);
     public ColorNode TargetNameColor { get; set; } = new ColorNode(Color.Violet.ToSharpDx());
     public WorldPathSettings WorldPathSettings { get; set; } = new WorldPathSettings();
+    public ToggleNode ShowPathLegend { get; set; } = new ToggleNode(true);
+    public RangeNode<int> PathLegendPositionX { get; set; } = new RangeNode<int>(100, 0, 4000);
+    public RangeNode<int> PathLegendPositionY { get; set; } = new RangeNode<int>(100, 0, 4000);
 }
 
 public class RadarSettings : ISettings
