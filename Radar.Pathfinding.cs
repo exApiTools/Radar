@@ -199,32 +199,15 @@ public partial class Radar
 
     private Dictionary<string, List<Vector2i>> GetTileTargets()
     {
-        var tileData = GameController.Memory.ReadStdVector<TileStructure>(_terrainMetadata.TgtArray);
-        var ret = new ConcurrentDictionary<string, ConcurrentQueue<Vector2i>>();
-        Parallel.For(0, tileData.Length, tileNumber =>
+        var list = GameController.IngameState.Data.Tiles.Select(x => (x.Name, x.Coordinate));
+        if (Settings.PathfindingSettings.IncludeTilePathsAsTargets)
         {
-            var tgtTileStruct = GameController.Memory.Read<TgtTileStruct>(tileData[tileNumber].TgtFilePtr);
-            var key2 = GameController.Memory.Read<TgtDetailStruct>(tgtTileStruct.TgtDetailPtr)
-                .name.ToString(GameController.Memory);
-            var coordinate = new Vector2i(
-                tileNumber % _terrainMetadata.NumCols * TileToGridConversion,
-                tileNumber / _terrainMetadata.NumCols * TileToGridConversion);
+            list = list.Concat(GameController.IngameState.Data.Tiles.Select(x => (x.Path, x.Coordinate)));
+        }
 
-            if (Settings.PathfindingSettings.IncludeTilePathsAsTargets)
-            {
-                var key1 = tgtTileStruct.TgtPath.ToString(GameController.Memory);
-                if (!string.IsNullOrEmpty(key1))
-                {
-                    ret.GetOrAdd(key1, _ => new ConcurrentQueue<Vector2i>()).Enqueue(coordinate);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(key2))
-            {
-                ret.GetOrAdd(key2, _ => new ConcurrentQueue<Vector2i>()).Enqueue(coordinate);
-            }
-        });
-        return ret.ToDictionary(k => k.Key, k => k.Value.ToList());
+        return list.Where(x => !string.IsNullOrEmpty(x.Name))
+            .GroupBy(x => x.Name)
+            .ToDictionary(x => x.Key, x => x.Select(p => p.Coordinate).Distinct().ToList());
     }
 
     private bool IsDescriptionInArea(string descriptionAreaPattern)
