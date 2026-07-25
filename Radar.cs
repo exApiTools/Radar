@@ -6,6 +6,7 @@ using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
+using ImGuiNET;
 using SharpDX;
 using System;
 using System.Collections.Concurrent;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Positioned = ExileCore.PoEMemory.Components.Positioned;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
@@ -48,7 +50,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private int[][] _processedTerrainData;
     private int[][] _processedTerrainTargetingData;
     private RectangleF _rect;
+    private ConcurrentDictionary<string, List<Room>> _rooms = [];
     private ConcurrentDictionary<Vector2, RouteDescription> _routes = new();
+    private bool _middleMouseWasDown;
 
     private ConcurrentDictionary<string, List<TargetDescription>> _targetDescriptions = new();
     private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
@@ -59,10 +63,11 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         GameController.PluginBridge.SaveMethod("Radar.LookForRoute",
             (Vector2 target, Action<List<Vector2i>> callback, CancellationToken cancellationToken) => AddRoute(target, null, callback, cancellationToken));
 
-        GameController.PluginBridge.SaveMethod("Radar.ClusterTarget", (string targetName, int expectedCount) => ClusterTarget(targetName, expectedCount));
+        GameController.PluginBridge.SaveMethod("Radar.ClusterTarget", (string targetName, int expectedCount) => ClusterTarget(targetName, null, expectedCount));
 
-        Input.RegisterKey(Settings.ManuallyDumpInstance.Value);
-        Settings.ManuallyDumpInstance.OnValueChanged += () => { Input.RegisterKey(Settings.ManuallyDumpInstance.Value); };
+        Input.RegisterKey(Settings.InstanceDumpSettings.ManualDumpHotkey.Value);
+        Settings.InstanceDumpSettings.ManualDumpHotkey.OnValueChanged += () => { Input.RegisterKey(Settings.InstanceDumpSettings.ManualDumpHotkey.Value); };
+        Settings.InstanceDumpSettings.ManualDumpButton.OnPressed = RunDump;
         return true;
     }
 
@@ -76,6 +81,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
             _heightData = GameController.IngameState.Data.RawTerrainHeightData;
             _allTargetLocations = GetTargets();
+            _rooms = GetRooms();
             _locationsByPosition = new ConcurrentDictionary<Vector2i, List<string>>(_allTargetLocations.SelectMany(x => x.Value.Select(y => (x.Key, y))).ToLookup(x => x.y, x => x.Key)
                 .ToDictionary(x => x.Key, x => x.ToList()));
 
@@ -83,9 +89,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             _processedTerrainData = Settings.ClearTriggerableBlockades ? GameController.IngameState.Data.GetClearedPathfindingData() : GameController.IngameState.Data.RawPathfindingData;
             _processedTerrainTargetingData = GameController.IngameState.Data.RawTerrainTargetingData;
 
-            if (Settings.AutoDumpInstanceOnAreaChange)
+            if (Settings.InstanceDumpSettings.AutoDumpOnAreaChange)
             {
-                Task.Run(() => { DumpInstanceData(GetInstanceDumpPath()); });
+                RunDump();
             }
 
             GenerateMapTexture();
@@ -96,7 +102,17 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
     private static string SanitizeAreaName(string name) => name.Replace(" ", "_").Replace(":", "").Replace("/", "").Replace("\\", "");
 
-    private string GetInstanceDumpPath() => $@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.Id}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}.json.gz";
+    private string GetInstanceDumpPath() => $@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.Id}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}";
+
+    private ConcurrentDictionary<string, List<Room>> GetRooms()
+    {
+        return new ConcurrentDictionary<string, List<Room>>(GameController.IngameState.Data.AreaGraphs
+            .SelectMany(x => x.Rooms)
+            .Select(ToRoom)
+            .Where(x => !string.IsNullOrEmpty(x.Name))
+            .GroupBy(x => x.Name)
+            .ToDictionary(x => x.Key, x => x.ToList()));
+    }
 
     public override void DrawSettings()
     {
@@ -182,9 +198,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
     public override void Render()
     {
-        if (Settings.ManuallyDumpInstance.PressedOnce())
+        if (Settings.InstanceDumpSettings.ManualDumpHotkey.PressedOnce())
         {
-            Task.Run(() => { DumpInstanceData(GetInstanceDumpPath()); });
+            RunDump();
         }
 
         if (!Settings.Debug.RenderInPeacefulZones && GameController.Area.CurrentArea.IsPeaceful) return;
@@ -216,10 +232,156 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             {
                 DrawLargeMap();
                 DrawTargets();
+                DrawRooms();
             }
         }
 
         DrawWorldPaths(ingameUi.Map.LargeMap.AsObject<SubMap>());
+    }
+
+    private void RunDump()
+    {
+        Task.Run(() => { DumpInstanceData(GetInstanceDumpPath()); });
+    }
+
+    private void DrawRooms()
+    {
+        if (!Settings.PathfindingSettings.ShowRooms)
+        {
+            return;
+        }
+
+        var regex = string.IsNullOrEmpty(Settings.PathfindingSettings.TargetNameFilter)
+            ? null
+            : new Regex(Settings.PathfindingSettings.TargetNameFilter, RegexOptions.IgnoreCase);
+        var rooms = new List<(string Name, string DisplayName, Vector2 MinGrid, Vector2 MaxGrid, Vector2 CenterScreen, Vector2 HoverMin, Vector2 HoverMax)>();
+        foreach (var areaGraph in GameController.IngameState.Data.AreaGraphs)
+        {
+            foreach (var room in areaGraph.Rooms)
+            {
+                if (string.IsNullOrEmpty(room.Name) || regex != null && !regex.IsMatch(room.Name))
+                {
+                    continue;
+                }
+
+                var minGrid = new Vector2(room.MinCoord.X * PoeMapExtension.TileToGridConversion, room.MinCoord.Y * PoeMapExtension.TileToGridConversion);
+                var maxGrid = new Vector2(room.MaxCoord.X * PoeMapExtension.TileToGridConversion, room.MaxCoord.Y * PoeMapExtension.TileToGridConversion);
+                var displayName = room.Name.StartsWith("Metadata/Terrain/") ? room.Name["Metadata/Terrain/".Length..] : room.Name;
+                var centerGrid = new Vector2((minGrid.X + maxGrid.X) / 2f, (minGrid.Y + maxGrid.Y) / 2f);
+                var centerScreen = MapGridToScreen(centerGrid, false);
+                GetRoomHoverBounds(minGrid, maxGrid, out var hoverMin, out var hoverMax);
+                rooms.Add((room.Name, displayName, minGrid, maxGrid, centerScreen, hoverMin, hoverMax));
+            }
+        }
+
+        var mousePosition = ImGui.GetMousePos();
+        var hoveredRoom = rooms
+            .Where(x => IsPointInRect(mousePosition, x.HoverMin, x.HoverMax))
+            .OrderBy(x => Vector2.DistanceSquared(mousePosition, x.CenterScreen))
+            .FirstOrDefault();
+        var hasHoveredRoom = hoveredRoom.Name != null;
+        var matchingRoomCount = hasHoveredRoom ? rooms.Count(x => x.Name == hoveredRoom.Name) : 0;
+        foreach (var room in rooms)
+        {
+            var isHovered = hasHoveredRoom && room.Name == hoveredRoom.Name && room.CenterScreen == hoveredRoom.CenterScreen;
+            var isMatching = hasHoveredRoom && room.Name == hoveredRoom.Name;
+            var lineColor = isHovered
+                ? new Color(0, 255, 0, 255)
+                : isMatching
+                    ? new Color(255, 165, 0, 220)
+                    : new Color(255, 255, 255, hasHoveredRoom ? 80 : 110);
+            var lineThickness = isHovered ? 3 : isMatching ? 2 : 1;
+            DrawRoomOutline(room.MinGrid, room.MaxGrid, lineColor, lineThickness);
+            DrawRoomHoverHint(room.CenterScreen);
+        }
+
+        var middleDown = (Control.MouseButtons & MouseButtons.Middle) != 0;
+        if (hasHoveredRoom && middleDown && !_middleMouseWasDown)
+        {
+            CopyTextToClipboard(hoveredRoom.Name);
+        }
+
+        _middleMouseWasDown = middleDown;
+
+        if (hasHoveredRoom)
+        {
+            ImGui.BeginTooltip();
+            ImGui.TextUnformatted(hoveredRoom.DisplayName);
+            ImGui.Separator();
+            ImGui.TextUnformatted(hoveredRoom.Name);
+            ImGui.Text($"Min: {hoveredRoom.MinGrid.X:0}, {hoveredRoom.MinGrid.Y:0}");
+            ImGui.Text($"Max: {hoveredRoom.MaxGrid.X:0}, {hoveredRoom.MaxGrid.Y:0}");
+            ImGui.Text($"Size: {hoveredRoom.MaxGrid.X - hoveredRoom.MinGrid.X:0} x {hoveredRoom.MaxGrid.Y - hoveredRoom.MinGrid.Y:0}");
+            if (matchingRoomCount > 1)
+            {
+                ImGui.Text($"Matches: {matchingRoomCount}");
+            }
+
+            ImGui.TextDisabled("Middle click to copy path");
+            ImGui.EndTooltip();
+        }
+    }
+
+    private void DrawRoomOutline(Vector2 minGrid, Vector2 maxGrid, Color lineColor, int lineThickness)
+    {
+        var (topLeft, topRight, bottomRight, bottomLeft) = GetRoomScreenCorners(minGrid, maxGrid);
+        Graphics.DrawLine(topLeft, topRight, lineThickness, lineColor);
+        Graphics.DrawLine(topRight, bottomRight, lineThickness, lineColor);
+        Graphics.DrawLine(bottomRight, bottomLeft, lineThickness, lineColor);
+        Graphics.DrawLine(bottomLeft, topLeft, lineThickness, lineColor);
+    }
+
+    private (Vector2 TopLeft, Vector2 TopRight, Vector2 BottomRight, Vector2 BottomLeft) GetRoomScreenCorners(Vector2 minGrid, Vector2 maxGrid)
+    {
+        return (
+            MapGridToScreen(new Vector2(minGrid.X, minGrid.Y), false),
+            MapGridToScreen(new Vector2(maxGrid.X, minGrid.Y), false),
+            MapGridToScreen(new Vector2(maxGrid.X, maxGrid.Y), false),
+            MapGridToScreen(new Vector2(minGrid.X, maxGrid.Y), false)
+        );
+    }
+
+    private void GetRoomHoverBounds(Vector2 minGrid, Vector2 maxGrid, out Vector2 min, out Vector2 max)
+    {
+        var (topLeft, topRight, bottomRight, bottomLeft) = GetRoomScreenCorners(minGrid, maxGrid);
+        var xMin = MathF.Min(MathF.Min(topLeft.X, topRight.X), MathF.Min(bottomRight.X, bottomLeft.X));
+        var xMax = MathF.Max(MathF.Max(topLeft.X, topRight.X), MathF.Max(bottomRight.X, bottomLeft.X));
+        var yMin = MathF.Min(MathF.Min(topLeft.Y, topRight.Y), MathF.Min(bottomRight.Y, bottomLeft.Y));
+        var yMax = MathF.Max(MathF.Max(topLeft.Y, topRight.Y), MathF.Max(bottomRight.Y, bottomLeft.Y));
+        var insetX = (xMax - xMin) * 0.25f;
+        var insetY = (yMax - yMin) * 0.25f;
+        min = new Vector2(xMin + insetX, yMin + insetY);
+        max = new Vector2(xMax - insetX, yMax - insetY);
+    }
+
+    private static bool IsPointInRect(Vector2 point, Vector2 min, Vector2 max)
+    {
+        return point.X >= min.X && point.X <= max.X && point.Y >= min.Y && point.Y <= max.Y;
+    }
+
+    private static void CopyTextToClipboard(string text)
+    {
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                Clipboard.SetText(text);
+            }
+            catch
+            {
+                // ignored
+            }
+        });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join(250);
+    }
+
+    private void DrawRoomHoverHint(Vector2 centerScreen)
+    {
+        var textSize = Graphics.MeasureText("Room");
+        var textPos = centerScreen - new Vector2(textSize.X, textSize.Y) / 2f;
+        Graphics.DrawTextWithBackground("Room", textPos, new Color(0, 0, 0, 180));
     }
 
     private void DrawWorldPaths(SubMap largeMap)
@@ -350,5 +512,17 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 }
             }
         }
+    }
+
+    private static Room ToRoom(AreaGraphRoomInstance room)
+    {
+        return new Room
+        {
+            Name = room.Name,
+            MinX = room.MinCoord.X * PoeMapExtension.TileToGridConversion,
+            MinY = room.MinCoord.Y * PoeMapExtension.TileToGridConversion,
+            MaxX = room.MaxCoord.X * PoeMapExtension.TileToGridConversion,
+            MaxY = room.MaxCoord.Y * PoeMapExtension.TileToGridConversion
+        };
     }
 }

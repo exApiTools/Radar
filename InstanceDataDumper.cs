@@ -7,6 +7,15 @@ using System.IO.Compression;
 
 namespace Radar;
 
+public class Room
+{
+    public string Name { get; set; }
+    public int MinX { get; set; }
+    public int MaxX { get; set; }
+    public int MinY { get; set; }
+    public int MaxY { get; set; }
+}
+
 public class TilePosition
 {
     public int X { get; set; }
@@ -25,6 +34,7 @@ public class OptimizedInstanceData
     public int[] Walk { get; set; }
     public int[] Target { get; set; }
     public List<TilePosition> Tiles { get; set; }
+    public List<Room> Rooms { get; set; }
 }
 
 public partial class Radar
@@ -75,11 +85,20 @@ public partial class Radar
                 Heights = heights,
                 Walk = walk,
                 Target = target,
-                Tiles = tilePositions
+                Tiles = tilePositions,
+                Rooms = GameController.IngameState.Data.AreaGraphs.SelectMany(x => x.Rooms).Select(ToRoom).ToList()
             };
 
+            if (!Settings.InstanceDumpSettings.IncludeGrids)
+            {
+                instanceData.Target = null;
+                instanceData.Walk = null;
+                instanceData.Heights = null;
+            }
+
             // Create directory if it doesn't exist
-            var fullPath = Path.GetFullPath(outputPath);
+            var extension = Settings.InstanceDumpSettings.CompressDumps ? ".json.gz" : ".json";
+            var fullPath = Path.GetFullPath(outputPath + extension);
             var directory = Path.GetDirectoryName(fullPath);
 
             if (!string.IsNullOrEmpty(directory))
@@ -89,17 +108,25 @@ public partial class Radar
             var json = JsonConvert.SerializeObject(
                 instanceData, new JsonSerializerSettings
                 {
-                    Formatting = Formatting.None
+                    Formatting = Settings.InstanceDumpSettings.CompressDumps ? Formatting.None : Formatting.Indented
                 });
 
             using var fileStream = File.Create(fullPath);
-            using var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
-            using var writer = new StreamWriter(gzipStream);
-            writer.Write(json);
+            if (Settings.InstanceDumpSettings.CompressDumps)
+            {
+                using var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
+                using var writer = new StreamWriter(gzipStream);
+                writer.Write(json);
+            }
+            else
+            {
+                using var writer = new StreamWriter(fileStream);
+                writer.Write(json);
+            }
         }
         catch (Exception ex)
         {
-            // ignored
+            _ = ex;
         }
     }
 }

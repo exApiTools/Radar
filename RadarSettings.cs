@@ -69,6 +69,7 @@ public class PathfindingSettings
     public ColorNode DefaultMapPathColor { get; set; } = new ColorNode(Color.Green.ToSharpDx());
     public ToggleNode UseRainbowColorsForMapPaths { get; set; } = new ToggleNode(true);
     public ToggleNode ShowAllTargets { get; set; } = new ToggleNode(false);
+    public ToggleNode ShowRooms { get; set; } = new ToggleNode(false);
 
     [Menu(null, "Do not show targets that occur more than X times per zone")]
     [ConditionalDisplay(nameof(ShowAllTargets))]
@@ -85,8 +86,6 @@ public class RadarSettings : ISettings
 {
     [JsonIgnore]
     public ButtonNode Reload { get; set; } = new ButtonNode();
-    public ToggleNode AutoDumpInstanceOnAreaChange { get; set; } = new ToggleNode(false);
-    public HotkeyNodeV2 ManuallyDumpInstance { get; set; } = new HotkeyNodeV2(Keys.None);
     public ToggleNode Enable { get; set; } = new ToggleNode(true);
     public RangeNode<float> CustomScale { get; set; } = new RangeNode<float>(1, 0.1f, 10);
     public ToggleNode DrawWalkableMap { get; set; } = new ToggleNode(true);
@@ -96,5 +95,17 @@ public class RadarSettings : ISettings
     public ToggleNode ClearTriggerableBlockades { get; set; } = new ToggleNode(true);
     public RangeNode<int> MaximumPathCount { get; set; } = new RangeNode<int>(1000, 0, 1000);
     public PathfindingSettings PathfindingSettings { get; set; } = new PathfindingSettings();
+    public InstanceDumpSettings InstanceDumpSettings { get; set; } = new InstanceDumpSettings();
     public DebugSettings Debug { get; set; } = new DebugSettings();
+}
+
+[Submenu(CollapsedByDefault = true)]
+public class InstanceDumpSettings
+{
+    public ToggleNode AutoDumpOnAreaChange { get; set; } = new ToggleNode(false);
+    public HotkeyNodeV2 ManualDumpHotkey { get; set; } = new HotkeyNodeV2(Keys.None);
+    [Menu("Run manual dump")]
+    public ButtonNode ManualDumpButton { get; set; } = new ButtonNode();
+    public ToggleNode CompressDumps { get; set; } = new ToggleNode(true);
+    public ToggleNode IncludeGrids { get; set; } = new ToggleNode(true);
 }

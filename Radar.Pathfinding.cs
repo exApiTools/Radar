@@ -251,8 +251,18 @@ public partial class Radar
         return tileMap;
     }
 
-    private IReadOnlyCollection<Vector2i> GetLocationsFromTilePattern(string tilePattern)
+    private IReadOnlyCollection<Vector2i> GetLocationsFromTilePattern(string tilePattern, string[] rooms)
     {
+        if (rooms is { Length: > 0 })
+        {
+            var roomRegexes = rooms.Select(x => x.ToLikeRegex()).ToList();
+            return _rooms
+                .Where(x => roomRegexes.Any(r => r.IsMatch(x.Key)))
+                .SelectMany(x => x.Value)
+                .Select(r => new Vector2i((r.MinX + r.MaxX) / 2, (r.MinY + r.MaxY) / 2))
+                .ToList();
+        }
+
         var regex = tilePattern.ToLikeRegex();
         return _allTargetLocations.Where(x => regex.IsMatch(x.Key)).SelectMany(x => x.Value).ToList();
     }
@@ -261,7 +271,7 @@ public partial class Radar
     {
         var expectedCount = target.ExpectedCount;
         var targetName = target.Name;
-        var locations = ClusterTarget(targetName, expectedCount);
+        var locations = ClusterTarget(targetName, target.Rooms, expectedCount);
         if (locations == null) return null;
         return new TargetLocations
         {
@@ -270,9 +280,9 @@ public partial class Radar
         };
     }
 
-    private Vector2[] ClusterTarget(string targetName, int expectedCount)
+    private Vector2[] ClusterTarget(string targetName, string[] rooms, int expectedCount)
     {
-        var tileList = GetLocationsFromTilePattern(targetName);
+        var tileList = GetLocationsFromTilePattern(targetName, rooms);
         if (tileList is not { Count: > 0 })
         {
             return null;
