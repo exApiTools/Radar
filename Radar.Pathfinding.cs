@@ -236,6 +236,16 @@ public partial class Radar
 
     private IReadOnlyCollection<Vector2i> GetLocationsFromTilePattern(string tilePattern, string[] rooms)
     {
+        if (rooms is { Length: > 0 })
+        {
+            var roomRegexes = rooms.Select(x => x.ToLikeRegex()).ToList();
+            return _rooms
+                .Where(x => roomRegexes.Any(r => r.IsMatch(x.Key)))
+                .SelectMany(x => x.Value)
+                .Select(r => new Vector2i((r.MinX + r.MaxX) / 2, (r.MinY + r.MaxY) / 2))
+                .ToList();
+        }
+
         var regex = tilePattern.ToLikeRegex();
         var locations = _allTargetLocations.Where(x => regex.IsMatch(x.Key)).SelectMany(x => x.Value).ToList();
         if (rooms != null)

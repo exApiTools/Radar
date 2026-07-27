@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -74,8 +74,8 @@ public partial class Radar
             {
                 X = kvp.Key.X,
                 Y = kvp.Key.Y,
-                W = TileToGridConversion,
-                H = TileToGridConversion,
+                W = ExileCore.Shared.Helpers.PoeMapExtension.TileToGridConversion,
+                H = ExileCore.Shared.Helpers.PoeMapExtension.TileToGridConversion,
                 Tiles = kvp.Value
             }).ToList();
 
@@ -92,6 +92,13 @@ public partial class Radar
                 instanceData.Target = target;
                 instanceData.Walk = walk;
                 instanceData.Heights = heights;
+            }
+
+            if (!Settings.InstanceDumpSettings.IncludeGrids)
+            {
+                instanceData.Target = null;
+                instanceData.Walk = null;
+                instanceData.Heights = null;
             }
 
             // Create directory if it doesn't exist
@@ -126,17 +133,5 @@ public partial class Radar
         {
             DebugWindow.LogError(ex.ToString());
         }
-    }
-
-    private static Room ToRoom(AreaGraphRoomInstance x)
-    {
-        return new Room
-        {
-            Name = x.Name,
-            MinX = x.MinCoord.X * TileToGridConversion,
-            MinY = x.MinCoord.Y * TileToGridConversion,
-            MaxX = x.MaxCoord.X * TileToGridConversion,
-            MaxY = x.MaxCoord.Y * TileToGridConversion,
-        };
     }
 }

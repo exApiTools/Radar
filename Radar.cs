@@ -1,10 +1,9 @@
-using ImGuiNET;
+﻿using ImGuiNET;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,44 +11,51 @@ using ExileCore;
 using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.MemoryObjects;
-using ExileCore.Shared;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
-using ImGuiNET;
+using System.Windows.Forms;
 using Positioned = ExileCore.PoEMemory.Components.Positioned;
-using RectangleF = SixLabors.ImageSharp.RectangleF;
+using Vector2 = System.Numerics.Vector2;
+using Vector3 = System.Numerics.Vector3;
 
 namespace Radar;
 
 public partial class Radar : BaseSettingsPlugin<RadarSettings>
 {
     private const string TextureName = "radar_minimap";
-    private const int TileToGridConversion = 23;
-    private const int TileToWorldConversion = 250;
-    public const float GridToWorldMultiplier = TileToWorldConversion / (float)TileToGridConversion;
-    private const double CameraAngle = 38.7 * Math.PI / 180;
-    private static readonly float CameraAngleCos = (float)Math.Cos(CameraAngle);
-    private static readonly float CameraAngleSin = (float)Math.Sin(CameraAngle);
-    private double _mapScale;
+    public const float GridToWorldMultiplier = PoeMapExtension.TileToWorldConversion / (float)PoeMapExtension.TileToGridConversion;
 
-    private ConcurrentDictionary<string, List<TargetDescription>> _targetDescriptions = new();
+    private static readonly List<SharpDX.Color> RainbowColors = new List<Color>
+    {
+        Color.Red,
+        Color.LightGreen,
+        Color.White,
+        Color.Yellow,
+        Color.LightBlue,
+        Color.Violet,
+        Color.Blue,
+        Color.Orange,
+        Color.Indigo
+    }.Select(x => x.ToSharpDx()).ToList();
+
+    private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
     private Vector2i? _areaDimensions;
-    private TerrainData _terrainMetadata;
+    private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
+    private List<(Regex, TargetDescription x)> _currentZoneTargetEntityPaths = new();
+    private CancellationTokenSource _findPathsCts = new();
     private float[][] _heightData;
+    private ConcurrentDictionary<Vector2i, List<string>> _locationsByPosition = new();
     private int[][] _processedTerrainData;
     private int[][] _processedTerrainTargetingData;
     private Dictionary<string, TargetDescription> _targetDescriptionsInArea = new();
-    private List<(Regex, TargetDescription x)> _currentZoneTargetEntityPaths = new();
-    private CancellationTokenSource _findPathsCts = new CancellationTokenSource();
-    private ConcurrentDictionary<string, TargetLocations> _clusteredTargetLocations = new();
-    private ConcurrentDictionary<string, List<Vector2i>> _allTargetLocations = new();
-    private ConcurrentDictionary<string, List<Room>> _rooms = [];
-    private ConcurrentDictionary<Vector2i, List<string>> _locationsByPosition = new();
     private SharpDX.RectangleF _rect;
-    private ImDrawListPtr _backGroundWindowPtr;
     private ConcurrentDictionary<Vector2, RouteDescription> _routes = new();
+    private bool _middleMouseWasDown;
+    private ConcurrentDictionary<string, List<Room>> _rooms = [];
+
+    private ConcurrentDictionary<string, List<TargetDescription>> _targetDescriptions = new();
 
     public override bool Initialise()
     {
@@ -71,8 +77,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         if (GameController.Game.IsInGameState || GameController.Game.IsEscapeState)
         {
             _targetDescriptionsInArea = GetTargetDescriptionsInArea().DistinctBy(x => x.EqualityId).ToDictionary(x => x.EqualityId);
-            _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).DistinctBy(x => x.Name).Select(x=>(x.Name.ToLikeRegex(), x)).ToList();
-            _terrainMetadata = GameController.IngameState.Data.DataStruct.Terrain;
+            _currentZoneTargetEntityPaths = _targetDescriptionsInArea.Values.Where(x => x.TargetType == TargetType.Entity).DistinctBy(x => x.Name).Select(x => (x.Name.ToLikeRegex(), x)).ToList();
             _heightData = GameController.IngameState.Data.RawTerrainHeightData;
             _allTargetLocations = GetTargets();
             _rooms = GetRooms();
@@ -80,10 +85,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 .SelectMany(x => x.Value.Select(y => (x.Key, y)))
                 .ToLookup(x => x.y, x => x.Key)
                 .ToDictionary(x => x.Key, x => x.ToList()));
+
             _areaDimensions = GameController.IngameState.Data.AreaDimensions;
-            _processedTerrainData = Settings.ClearTriggerableBlockades 
-                ? GameController.IngameState.Data.GetClearedPathfindingData() 
-                : GameController.IngameState.Data.RawPathfindingData;
+            _processedTerrainData = Settings.ClearTriggerableBlockades ? GameController.IngameState.Data.GetClearedPathfindingData() : GameController.IngameState.Data.RawPathfindingData;
             _processedTerrainTargetingData = GameController.IngameState.Data.RawTerrainTargetingData;
 
             if (Settings.InstanceDumpSettings.AutoDumpOnAreaChange)
@@ -96,39 +100,26 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             StartPathFinding();
         }
     }
+    
+    private string GetInstanceDumpPath() => $@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.Id}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}";
+
+    private static string SanitizeAreaName(string name) => name.Replace(" ", "_").Replace(":", "").Replace("/", "").Replace("\\", "");
 
     private ConcurrentDictionary<string, List<Room>> GetRooms()
     {
-        return new ConcurrentDictionary<string, List<Room>>(GameController.IngameState.Data.AreaGraphs.SelectMany(x => x.Rooms).Select(ToRoom).Where(x => x.Name != null).GroupBy(x => x.Name)
+        return new ConcurrentDictionary<string, List<Room>>(GameController.IngameState.Data.AreaGraphs
+            .SelectMany(x => x.Rooms)
+            .Select(ToRoom)
+            .Where(x => !string.IsNullOrEmpty(x.Name))
+            .GroupBy(x => x.Name)
             .ToDictionary(x => x.Key, x => x.ToList()));
-    }
-
-    private static string SanitizeAreaName(string name)
-    {
-        return name.Replace(" ", "_")
-            .Replace(":", "")
-            .Replace("/", "")
-            .Replace("\\", "");
     }
 
     public override void DrawSettings()
     {
-        Settings.PathfindingSettings.CurrentZoneName.Value = GameController.Area.CurrentArea.Area.RawName;
+        Settings.PathfindingSettings.CurrentZoneName.Value = GameController.Area.CurrentArea.Area.Id;
         base.DrawSettings();
     }
-
-    private static readonly List<SharpDX.Color> RainbowColors = new List<Color>
-    {
-        Color.Red,
-        Color.LightGreen,
-        Color.White,
-        Color.Yellow,
-        Color.LightBlue,
-        Color.Violet,
-        Color.Blue,
-        Color.Orange,
-        Color.Indigo,
-    }.Select(x => x.ToSharpDx()).ToList();
 
     public override void OnLoad()
     {
@@ -141,6 +132,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 AreaChange(GameController.Area.CurrentArea);
             });
         };
+
         Settings.MaximumPathCount.OnValueChanged += (_, _) => { Task.Run(RestartPathFinding); };
         Settings.TerrainColor.OnValueChanged += (_, _) => { GenerateMapTexture(); };
         Settings.Debug.DrawHeightMap.OnValueChanged += (_, _) => { GenerateMapTexture(); };
@@ -161,9 +153,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         if (positioned != null)
         {
             var path = entity.Path;
-            if (_currentZoneTargetEntityPaths.FirstOrDefault(x=>x.Item1.IsMatch(path)).x is {} targetDescription)
+            if (_currentZoneTargetEntityPaths.FirstOrDefault(x => x.Item1.IsMatch(path)).x is { } targetDescription)
             {
-                bool alreadyContains = false;
+                var alreadyContains = false;
                 var truncatedPos = positioned.GridPosNum.Truncate();
                 _allTargetLocations.AddOrUpdate(path, _ => [truncatedPos],
                     // ReSharper disable once AssignmentInConditionalExpression
@@ -185,14 +177,24 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         }
     }
 
-    private Vector2 GetPlayerPosition()
+    private Vector2 GetPlayerMapGrid()
     {
-        var player = GameController.Game.IngameState.Data.LocalPlayer;
-        var playerPositionComponent = player.GetComponent<Positioned>();
-        if (playerPositionComponent == null)
-            return new Vector2(0, 0);
-        var playerPosition = new Vector2(playerPositionComponent.GridX, playerPositionComponent.GridY);
-        return playerPosition;
+        var pos = GameController.Game.IngameState.Data.LocalPlayer.PosNum;
+        return new Vector2(pos.X * PoeMapExtension.WorldToGridConversion, pos.Y * PoeMapExtension.WorldToGridConversion);
+    }
+
+    private Vector2 GetPlayerTerrainGrid()
+    {
+        var pos = GameController.Game.IngameState.Data.LocalPlayer?.GetComponent<Positioned>();
+        return pos == null ? GetPlayerMapGrid() : new Vector2(pos.GridX, pos.GridY);
+    }
+
+    private Vector2 GetPlayerPosition() => GetPlayerMapGrid();
+
+    private SubMap GetVisibleSubMap()
+    {
+        var map = GameController.Game.IngameState.IngameUi.Map;
+        return map.VisibleSubMap == VisibleSubMap.Small ? map.SmallMiniMap : map.LargeMap.AsObject<SubMap>();
     }
 
     public override void Render()
@@ -202,23 +204,16 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             RunDump();
         }
 
-        if (!Settings.Debug.RenderInPeacefulZones && GameController.Area.CurrentArea.IsPeaceful)
-            return;
+        if (!Settings.Debug.RenderInPeacefulZones && GameController.Area.CurrentArea.IsPeaceful) return;
 
         var ingameUi = GameController.Game.IngameState.IngameUi;
-        if (!Settings.Debug.IgnoreFullscreenPanels &&
-            ingameUi.FullscreenPanels.Any(x => x.IsVisible))
-        {
-            return;
-        }
+        var anyFullscreenPanelVisible = ingameUi.FullscreenPanels.Any(x => x.IsVisible);
+        if (!Settings.Debug.IgnoreFullscreenPanels && anyFullscreenPanelVisible) return;
 
-        if (!Settings.Debug.IgnoreLargePanels &&
-            ingameUi.LargePanels.Any(x => x.IsVisible))
-        {
-            return;
-        }
+        var anyLargePanelVisible = ingameUi.LargePanels.Any(x => x.IsVisible);
+        if (!Settings.Debug.IgnoreLargePanels && anyLargePanelVisible) return;
 
-        _rect = GameController.Window.GetWindowRectangle() with { Location = SharpDX.Vector2.Zero };
+        _rect = GameController.Window.GetWindowRectangle() with {Location = SharpDX.Vector2.Zero};
         if (!Settings.Debug.DisableDrawRegionLimiting)
         {
             if (ingameUi.OpenRightPanel.IsVisible)
@@ -231,89 +226,171 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 _rect.Left = ingameUi.OpenLeftPanel.GetClientRectCache.Right;
             }
         }
-
-        ImGui.SetNextWindowSize(new Vector2(_rect.Width, _rect.Height));
-        ImGui.SetNextWindowPos(new Vector2(_rect.Left, _rect.Top));
-
-        ImGui.Begin("radar_background",
-            ImGuiWindowFlags.NoDecoration |
-            ImGuiWindowFlags.NoInputs |
-            ImGuiWindowFlags.NoMove |
-            ImGuiWindowFlags.NoScrollWithMouse |
-            ImGuiWindowFlags.NoSavedSettings |
-            ImGuiWindowFlags.NoFocusOnAppearing |
-            ImGuiWindowFlags.NoBringToFrontOnFocus |
-            ImGuiWindowFlags.NoBackground);
-
-        _backGroundWindowPtr = ImGui.GetWindowDrawList();
-        var map = ingameUi.Map;
-        var largeMap = map.LargeMap.AsObject<SubMap>();
-        if (largeMap.IsVisible)
+        
+        
+        if (ingameUi.Map.VisibleSubMap != VisibleSubMap.None)
         {
-            var mapCenter = largeMap.MapCenter + new Vector2(Settings.Debug.MapCenterOffsetX, Settings.Debug.MapCenterOffsetY);
-            _mapScale = largeMap.MapScale * Settings.CustomScale;
-            DrawLargeMap(mapCenter);
-            DrawTargets(mapCenter);
+            using var clip = ingameUi.Map.VisibleSubMap == VisibleSubMap.Large 
+                ? Graphics.BeginRectClip(_rect)
+                : Graphics.MapSurfaceClip(VisibleSubMap.Any);
+            DrawLargeMap();
+            DrawTargets();
+            DrawRooms();
         }
 
-        DrawWorldPaths(largeMap);
+        DrawWorldPaths(ingameUi.Map.LargeMap.AsObject<SubMap>());
         DrawPathLegend();
-        ImGui.End();
-        DrawRooms();
     }
 
     private void RunDump()
     {
-        Task.Run(() =>
-        {
-            DumpInstanceData($@"{DirectoryFullName}\instance_dumps\{GameController.Area.CurrentArea.Area.RawName}_{SanitizeAreaName(GameController.Area.CurrentArea.Area.Name)}");
-        });
+        Task.Run(() => { DumpInstanceData(GetInstanceDumpPath()); });
     }
 
     private void DrawRooms()
     {
-        if (Settings.PathfindingSettings.ShowRooms)
+        if (!Settings.PathfindingSettings.ShowRooms)
         {
-            var regex = string.IsNullOrEmpty(Settings.PathfindingSettings.TargetNameFilter)
-                ? null
-                : new Regex(Settings.PathfindingSettings.TargetNameFilter, RegexOptions.IgnoreCase);
-            var areaCompositions = GameController.IngameState.Data.AreaGraphs;
-            foreach (var composition in areaCompositions)
+            return;
+        }
+
+        var regex = string.IsNullOrEmpty(Settings.PathfindingSettings.TargetNameFilter)
+            ? null
+            : new Regex(Settings.PathfindingSettings.TargetNameFilter, RegexOptions.IgnoreCase);
+        var rooms = new List<(string Name, string DisplayName, Vector2 MinGrid, Vector2 MaxGrid, Vector2 CenterScreen, Vector2 HoverMin, Vector2 HoverMax)>();
+        foreach (var areaGraph in GameController.IngameState.Data.AreaGraphs)
+        {
+            foreach (var room in areaGraph.Rooms)
             {
-                foreach (var room in composition.Rooms)
+                if (string.IsNullOrEmpty(room.Name) || regex != null && !regex.IsMatch(room.Name))
                 {
-                    if (regex != null && !regex.IsMatch(room.Name))
-                    {
-                        continue;
-                    }
-                    var minGrid = new Vector2(room.MinCoord.X * PoeMapExtension.TileToGridConversion, room.MinCoord.Y * PoeMapExtension.TileToGridConversion);
-                    var maxGrid = new Vector2(room.MaxCoord.X * PoeMapExtension.TileToGridConversion, room.MaxCoord.Y * PoeMapExtension.TileToGridConversion);
-
-                    var topLeftGrid = new Vector2(minGrid.X, minGrid.Y);
-                    var topRightGrid = new Vector2(maxGrid.X, minGrid.Y);
-                    var bottomRightGrid = new Vector2(maxGrid.X, maxGrid.Y);
-                    var bottomLeftGrid = new Vector2(minGrid.X, maxGrid.Y);
-
-                    var topLeft = Graphics.GridToMap(topLeftGrid, topLeftGrid, VisibleSubMap.Large);
-                    var topRight = Graphics.GridToMap(topRightGrid, topRightGrid, VisibleSubMap.Large);
-                    var bottomRight = Graphics.GridToMap(bottomRightGrid, bottomRightGrid, VisibleSubMap.Large);
-                    var bottomLeft = Graphics.GridToMap(bottomLeftGrid, bottomLeftGrid, VisibleSubMap.Large);
-
-                    var points = new[] { topLeft, topRight, bottomRight, bottomLeft, topLeft };
-                    Graphics.DrawPolyLine(points, Color.YellowGreen.ToSharpDx(), 2);
-
-                    var centerGrid = new Vector2((minGrid.X + maxGrid.X) / 2f, (minGrid.Y + maxGrid.Y) / 2f);
-                    var centerScreen = Graphics.GridToMap(centerGrid, centerGrid, VisibleSubMap.Large);
-                    Graphics.DrawTextWithBackground(room.Name.Substring("Metadata/Terrain/".Length), centerScreen, Color.Red.ToSharpDx(), FontAlign.Center, Color.Black.ToSharpDx());
+                    continue;
                 }
+
+                var minGrid = new Vector2(room.MinCoord.X * PoeMapExtension.TileToGridConversion, room.MinCoord.Y * PoeMapExtension.TileToGridConversion);
+                var maxGrid = new Vector2(room.MaxCoord.X * PoeMapExtension.TileToGridConversion, room.MaxCoord.Y * PoeMapExtension.TileToGridConversion);
+                var displayName = room.Name.StartsWith("Metadata/Terrain/") ? room.Name["Metadata/Terrain/".Length..] : room.Name;
+                var centerGrid = new Vector2((minGrid.X + maxGrid.X) / 2f, (minGrid.Y + maxGrid.Y) / 2f);
+                var centerScreen = MapGridToScreen(centerGrid, false);
+                GetRoomHoverBounds(minGrid, maxGrid, out var hoverMin, out var hoverMax);
+                rooms.Add((room.Name, displayName, minGrid, maxGrid, centerScreen, hoverMin, hoverMax));
             }
         }
+
+        var mousePosition = ImGui.GetMousePos();
+        var hoveredRoom = rooms
+            .Where(x => IsPointInRect(mousePosition, x.HoverMin, x.HoverMax))
+            .OrderBy(x => Vector2.DistanceSquared(mousePosition, x.CenterScreen))
+            .FirstOrDefault();
+        var hasHoveredRoom = hoveredRoom.Name != null;
+        var matchingRoomCount = hasHoveredRoom ? rooms.Count(x => x.Name == hoveredRoom.Name) : 0;
+        foreach (var room in rooms)
+        {
+            var isHovered = hasHoveredRoom && room.Name == hoveredRoom.Name && room.CenterScreen == hoveredRoom.CenterScreen;
+            var isMatching = hasHoveredRoom && room.Name == hoveredRoom.Name;
+            var lineColor = isHovered
+                ? new SharpDX.Color(0, 255, 0, 255)
+                : isMatching
+                    ? new SharpDX.Color(255, 165, 0, 220)
+                    : new SharpDX.Color(255, 255, 255, hasHoveredRoom ? 80 : 110);
+            var lineThickness = isHovered ? 3 : isMatching ? 2 : 1;
+            DrawRoomOutline(room.MinGrid, room.MaxGrid, lineColor, lineThickness);
+            DrawRoomHoverHint(room.CenterScreen);
+        }
+
+        var middleDown = (Control.MouseButtons & MouseButtons.Middle) != 0;
+        if (hasHoveredRoom && middleDown && !_middleMouseWasDown)
+        {
+            CopyTextToClipboard(hoveredRoom.Name);
+        }
+
+        _middleMouseWasDown = middleDown;
+
+        if (hasHoveredRoom)
+        {
+            ImGui.BeginTooltip();
+            ImGui.TextUnformatted(hoveredRoom.DisplayName);
+            ImGui.Separator();
+            ImGui.TextUnformatted(hoveredRoom.Name);
+            ImGui.Text($"Min: {hoveredRoom.MinGrid.X:0}, {hoveredRoom.MinGrid.Y:0}");
+            ImGui.Text($"Max: {hoveredRoom.MaxGrid.X:0}, {hoveredRoom.MaxGrid.Y:0}");
+            ImGui.Text($"Size: {hoveredRoom.MaxGrid.X - hoveredRoom.MinGrid.X:0} x {hoveredRoom.MaxGrid.Y - hoveredRoom.MinGrid.Y:0}");
+            if (matchingRoomCount > 1)
+            {
+                ImGui.Text($"Matches: {matchingRoomCount}");
+            }
+
+            ImGui.TextDisabled("Middle click to copy path");
+            ImGui.EndTooltip();
+        }
+    }
+
+    private void DrawRoomOutline(Vector2 minGrid, Vector2 maxGrid, SharpDX.Color lineColor, int lineThickness)
+    {
+        var (topLeft, topRight, bottomRight, bottomLeft) = GetRoomScreenCorners(minGrid, maxGrid);
+        Graphics.DrawLine(topLeft, topRight, lineThickness, lineColor);
+        Graphics.DrawLine(topRight, bottomRight, lineThickness, lineColor);
+        Graphics.DrawLine(bottomRight, bottomLeft, lineThickness, lineColor);
+        Graphics.DrawLine(bottomLeft, topLeft, lineThickness, lineColor);
+    }
+
+    private (Vector2 TopLeft, Vector2 TopRight, Vector2 BottomRight, Vector2 BottomLeft) GetRoomScreenCorners(Vector2 minGrid, Vector2 maxGrid)
+    {
+        return (
+            MapGridToScreen(new Vector2(minGrid.X, minGrid.Y), false),
+            MapGridToScreen(new Vector2(maxGrid.X, minGrid.Y), false),
+            MapGridToScreen(new Vector2(maxGrid.X, maxGrid.Y), false),
+            MapGridToScreen(new Vector2(minGrid.X, maxGrid.Y), false)
+        );
+    }
+
+    private void GetRoomHoverBounds(Vector2 minGrid, Vector2 maxGrid, out Vector2 min, out Vector2 max)
+    {
+        var (topLeft, topRight, bottomRight, bottomLeft) = GetRoomScreenCorners(minGrid, maxGrid);
+        var xMin = MathF.Min(MathF.Min(topLeft.X, topRight.X), MathF.Min(bottomRight.X, bottomLeft.X));
+        var xMax = MathF.Max(MathF.Max(topLeft.X, topRight.X), MathF.Max(bottomRight.X, bottomLeft.X));
+        var yMin = MathF.Min(MathF.Min(topLeft.Y, topRight.Y), MathF.Min(bottomRight.Y, bottomLeft.Y));
+        var yMax = MathF.Max(MathF.Max(topLeft.Y, topRight.Y), MathF.Max(bottomRight.Y, bottomLeft.Y));
+        var insetX = (xMax - xMin) * 0.25f;
+        var insetY = (yMax - yMin) * 0.25f;
+        min = new Vector2(xMin + insetX, yMin + insetY);
+        max = new Vector2(xMax - insetX, yMax - insetY);
+    }
+
+    private static bool IsPointInRect(Vector2 point, Vector2 min, Vector2 max)
+    {
+        return point.X >= min.X && point.X <= max.X && point.Y >= min.Y && point.Y <= max.Y;
+    }
+
+    private static void CopyTextToClipboard(string text)
+    {
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                Clipboard.SetText(text);
+            }
+            catch
+            {
+                // ignored
+            }
+        });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join(250);
+    }
+
+    private void DrawRoomHoverHint(Vector2 centerScreen)
+    {
+        var textSize = Graphics.MeasureText("Room");
+        var textPos = centerScreen - new Vector2(textSize.X, textSize.Y) / 2f;
+        Graphics.DrawTextWithBackground("Room", textPos, new SharpDX.Color(0, 0, 0, 180));
     }
 
     private void DrawWorldPaths(SubMap largeMap)
     {
-        if (Settings.PathfindingSettings.WorldPathSettings.ShowPathsToTargets &&
-            (!largeMap.IsVisible || !Settings.PathfindingSettings.WorldPathSettings.ShowPathsToTargetsOnlyWithClosedMap))
+        var worldPathSettings = Settings.PathfindingSettings.WorldPathSettings;
+        if (worldPathSettings.ShowPathsToTargets && (!largeMap.IsVisible || !worldPathSettings.ShowPathsToTargetsOnlyWithClosedMap))
         {
             var player = GameController.Game.IngameState.Data.LocalPlayer;
             var playerRender = player?.GetComponent<Render>();
@@ -331,17 +408,17 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 {
                     var p1 = GameController.IngameState.Camera.WorldToScreen(
                         new Vector3(elem.X * GridToWorldMultiplier, elem.Y * GridToWorldMultiplier, _heightData[elem.Y][elem.X]));
-                    var offsetDirection = Settings.PathfindingSettings.WorldPathSettings.OffsetPaths
+                    var offsetDirection = worldPathSettings.OffsetPaths 
                         ? (p1 - p0) switch { var s => new Vector2(s.Y, -s.X) / s.Length() }
                         : Vector2.Zero;
-                    var finalOffset = offsetDirection * offsetAmount * Settings.PathfindingSettings.WorldPathSettings.PathThickness;
+                    var finalOffset = offsetDirection * offsetAmount * worldPathSettings.PathThickness;
                     p0 = p1;
                     p1 += finalOffset;
-                    if (++i % Settings.PathfindingSettings.WorldPathSettings.DrawEveryNthSegment == 0)
+                    if (++i % worldPathSettings.DrawEveryNthSegment == 0)
                     {
                         if (_rect.Contains(p0WithOffset) || _rect.Contains(p1))
                         {
-                            Graphics.DrawLine(p0WithOffset, p1, Settings.PathfindingSettings.WorldPathSettings.PathThickness, route.WorldColor());
+                            Graphics.DrawLine(p0WithOffset, p1, worldPathSettings.PathThickness, route.WorldColor());
                         }
                         else
                         {
@@ -355,7 +432,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
         }
     }
 
-	private void DrawPathLegend()
+    private void DrawPathLegend()
 	{
 	    if (!Settings.PathfindingSettings.ShowPathLegend) return;
 	    if (_clusteredTargetLocations.Count == 0) return;
@@ -384,72 +461,67 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 	
 	    var bgHeight = padding * 2 + entries.Count * lineHeight;
 	
-	    _backGroundWindowPtr.AddRectFilled(
+	    Graphics.DrawBox(
 	        new Vector2(startX - padding, startY - padding),
 	        new Vector2(startX + legendWidth, startY + bgHeight),
-	        Color.FromArgb(180, 0, 0, 0).ToImgui());
+            new SharpDX.Color(SharpDX.Vector3.Zero, 180 / 255f));
 	
 	    for (var i = 0; i < entries.Count; i++)
 	    {
 	        var (name, color) = entries[i];
 	        var y = startY + i * lineHeight;
-	
-	        _backGroundWindowPtr.AddRectFilled(
+
+            Graphics.DrawBox(
 	            new Vector2(startX, y + 2),
 	            new Vector2(startX + boxSize, y + boxSize + 2),
-	            color.ToImgui());
+	            color);
 	
-	        _backGroundWindowPtr.AddText(
-	            new Vector2(startX + boxSize + 8, y),
-	            Color.White.ToImgui(),
-	            name);
+	        Graphics.DrawText(name, new Vector2(startX + boxSize + 8, y));
 	    }
 	}
 
-    private void DrawBox(Vector2 p0, Vector2 p1, SharpDX.Color color)
+    private Vector2 MapGridToScreen(Vector2 gridCell, bool perCellTerrain = true)
     {
-        _backGroundWindowPtr.AddRectFilled(p0, p1, color.ToImgui());
-    }
-
-    private void DrawText(string text, Vector2 pos, SharpDX.Color color)
-    {
-        _backGroundWindowPtr.AddText(pos, color.ToImgui(), text);
-    }
-
-    private Vector2 TranslateGridDeltaToMapDelta(Vector2 delta, float deltaZ)
-    {
-        deltaZ /= GridToWorldMultiplier; //z is normally "world" units, translate to grid
-        return (float)_mapScale * new Vector2((delta.X - delta.Y) * CameraAngleCos, (deltaZ - (delta.X + delta.Y)) * CameraAngleSin);
-    }
-
-    private void DrawLargeMap(Vector2 mapCenter)
-    {
-        if (!Settings.DrawWalkableMap || !Graphics.HasImage(TextureName) || _areaDimensions == null)
-            return;
-        var player = GameController.Game.IngameState.Data.LocalPlayer;
-        var playerRender = player.GetComponent<Render>();
+        var playerGridPosition = GetPlayerMapGrid();
+        var playerTerrain = GetPlayerTerrainGrid();
+        var playerScreenPosition = Graphics.GridToMap(playerGridPosition, playerTerrain, VisibleSubMap.Any);
+        var screenOffset = new Vector2(Settings.Debug.MapCenterOffsetX.Value, Settings.Debug.MapCenterOffsetY.Value);
+        var playerRender = GameController.Game.IngameState.Data.LocalPlayer?.GetComponent<Render>();
         if (playerRender == null)
-            return;
-        var rectangleF = new RectangleF(-playerRender.GridPos().X, -playerRender.GridPos().Y, _areaDimensions.Value.X, _areaDimensions.Value.Y);
-        var playerHeight = -playerRender.UnclampedHeight;
-        var p1 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Top), playerHeight);
-        var p2 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Top), playerHeight);
-        var p3 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Right, rectangleF.Bottom), playerHeight);
-        var p4 = mapCenter + TranslateGridDeltaToMapDelta(new Vector2(rectangleF.Left, rectangleF.Bottom), playerHeight);
-        _backGroundWindowPtr.AddImageQuad(Graphics.GetTextureId(TextureName), p1, p2, p3, p4);
+        {
+            var cellScreenPosition = Graphics.GridToMap(gridCell, gridCell, VisibleSubMap.Any);
+            return playerScreenPosition + (cellScreenPosition - playerScreenPosition) * Settings.CustomScale.Value + screenOffset;
+        }
+
+        var ingameData = GameController.IngameState.Data;
+        var deltaZ = -playerRender.UnclampedHeight;
+        if (perCellTerrain)
+            deltaZ += ingameData.GetTerrainHeightAt(gridCell);
+
+        var mapDelta = ingameData.TranslateGridDeltaToMapDelta(GetVisibleSubMap(), gridCell - playerGridPosition, deltaZ);
+        return playerScreenPosition + mapDelta * Settings.CustomScale.Value + screenOffset;
     }
 
-    private void DrawTargets(Vector2 mapCenter)
+    private void DrawLargeMap()
     {
-        var color = Settings.PathfindingSettings.TargetNameColor.Value;
-        var player = GameController.Game.IngameState.Data.LocalPlayer;
-        var playerRender = player.GetComponent<Render>();
-        if (playerRender == null)
-            return;
-        var playerPosition = new Vector2(playerRender.GridPos().X, playerRender.GridPos().Y);
-        var playerHeight = -playerRender.UnclampedHeight;
+        if (!Settings.DrawWalkableMap || !Graphics.HasImage(TextureName) || _areaDimensions == null) return;
+        if (GameController.Game.IngameState.Data.LocalPlayer == null) return;
+        var areaWidth = (float)_areaDimensions.Value.X;
+        var areaHeight = (float)_areaDimensions.Value.Y;
+        var p1 = MapGridToScreen(new Vector2(0, 0), false);
+        var p2 = MapGridToScreen(new Vector2(areaWidth, 0), false);
+        var p3 = MapGridToScreen(new Vector2(areaWidth, areaHeight), false);
+        var p4 = MapGridToScreen(new Vector2(0, areaHeight), false);
+        Graphics.DrawQuad(Graphics.GetTextureId(TextureName), p1, p2, p3, p4);
+    }
+
+    private void DrawTargets()
+    {
+        var pathfindingSettings = Settings.PathfindingSettings;
+        var color = pathfindingSettings.TargetNameColor.Value;
+        if (GameController.Game.IngameState.Data.LocalPlayer?.GetComponent<Positioned>() == null) return;
         var ithElement = 0;
-        if (Settings.PathfindingSettings.ShowPathsToTargetsOnMap)
+        if (pathfindingSettings.ShowPathsToTargetsOnMap)
         {
             foreach (var route in _routes.Values)
             {
@@ -457,51 +529,57 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 ithElement %= 5;
                 foreach (var elem in route.Path.Skip(ithElement).GetEveryNth(5))
                 {
-                    var mapDelta = TranslateGridDeltaToMapDelta(new Vector2(elem.X, elem.Y) - playerPosition, playerHeight + _heightData[elem.Y][elem.X]);
-                    DrawBox(mapCenter + mapDelta - new Vector2(2, 2), mapCenter + mapDelta + new Vector2(2, 2), route.MapColor());
+                    var mapPos = MapGridToScreen(new Vector2(elem.X, elem.Y));
+                    Graphics.DrawBox(mapPos - new Vector2(2, 2), mapPos + new Vector2(2, 2), route.MapColor());
                 }
             }
         }
 
-        if (Settings.PathfindingSettings.ShowAllTargets)
+        if (pathfindingSettings.ShowAllTargets)
         {
+            var regex = string.IsNullOrEmpty(pathfindingSettings.TargetNameFilter) 
+                ? null 
+                : new Regex(pathfindingSettings.TargetNameFilter);
+
             foreach (var (location, texts) in _locationsByPosition)
             {
-                var regex = string.IsNullOrEmpty(Settings.PathfindingSettings.TargetNameFilter)
-                    ? null
-                    : new Regex(Settings.PathfindingSettings.TargetNameFilter);
-
                 bool TargetFilter(string t) =>
                     (regex?.IsMatch(t) ?? true) &&
-                    _allTargetLocations.GetValueOrDefault(t) is { } list && list.Count <= Settings.PathfindingSettings.MaxTargetNameCount;
+                    _allTargetLocations.GetValueOrDefault(t) is { } list && 
+                    list.Count <= pathfindingSettings.MaxTargetNameCount;
 
                 var text = string.Join("\n", texts.Distinct().Where(TargetFilter));
                 var textOffset = Graphics.MeasureText(text) / 2f;
-                var mapDelta = TranslateGridDeltaToMapDelta(location - playerPosition, playerHeight + _heightData[location.Y][location.X]);
-                var mapPos = mapCenter + mapDelta;
-                if (Settings.PathfindingSettings.EnableTargetNameBackground)
-                    DrawBox(mapPos - textOffset, mapPos + textOffset, Color.Black.ToSharpDx());
-                DrawText(text, mapPos - textOffset, color);
+                var mapPos = MapGridToScreen(new Vector2(location.X, location.Y));
+                if (pathfindingSettings.EnableTargetNameBackground) Graphics.DrawBox(mapPos - textOffset, mapPos + textOffset, System.Drawing.Color.Black.ToSharpDx());
+                Graphics.DrawText(text, mapPos - textOffset, color);
             }
         }
-        else if (Settings.PathfindingSettings.ShowSelectedTargets)
+        else if (pathfindingSettings.ShowSelectedTargets)
         {
             foreach (var (_, description) in _clusteredTargetLocations)
             {
                 foreach (var clusterPosition in description.Locations)
                 {
-                    float clusterHeight = 0;
-                    if (clusterPosition.X < _heightData[0].Length && clusterPosition.Y < _heightData.Length)
-                        clusterHeight = _heightData[(int)clusterPosition.Y][(int)clusterPosition.X];
                     var text = description.DisplayName;
                     var textOffset = Graphics.MeasureText(text) / 2f;
-                    var mapDelta = TranslateGridDeltaToMapDelta(clusterPosition - playerPosition, playerHeight + clusterHeight);
-                    var mapPos = mapCenter + mapDelta;
-                    if (Settings.PathfindingSettings.EnableTargetNameBackground)
-                        DrawBox(mapPos - textOffset, mapPos + textOffset, Color.Black.ToSharpDx());
-                    DrawText(text, mapPos - textOffset, color);
+                    var mapPos = MapGridToScreen(new Vector2(clusterPosition.X, clusterPosition.Y));
+                    if (pathfindingSettings.EnableTargetNameBackground) Graphics.DrawBox(mapPos - textOffset, mapPos + textOffset, System.Drawing.Color.Black.ToSharpDx());
+                    Graphics.DrawText(text, mapPos - textOffset, color);
                 }
             }
         }
+    }
+
+    private static Room ToRoom(AreaGraphRoomInstance room)
+    {
+        return new Room
+        {
+            Name = room.Name,
+            MinX = room.MinCoord.X * PoeMapExtension.TileToGridConversion,
+            MinY = room.MinCoord.Y * PoeMapExtension.TileToGridConversion,
+            MaxX = room.MaxCoord.X * PoeMapExtension.TileToGridConversion,
+            MaxY = room.MaxCoord.Y * PoeMapExtension.TileToGridConversion
+        };
     }
 }
