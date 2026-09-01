@@ -16,6 +16,13 @@ public record TargetDescription : TargetDescriptionAlternative
     /// </summary>
     public DeathCondition HideWhenDead { get; set; }
 
+    /// <summary>
+    /// Stop showing this target once a matching chest has been seen opened. A chart encounter is
+    /// spent the moment its chest is looted, but the room it sits in stays in the area graph, so
+    /// nothing else would ever retire the waypoint.
+    /// </summary>
+    public OpenCondition HideWhenOpened { get; set; }
+
     internal string EqualityId => $"{Name}#{string.Join(",", Rooms ?? [])}";
 }
 
@@ -39,6 +46,24 @@ public record DeathCondition
     /// Minimum rarity. Unique by default: a map boss qualifies, the adds it spawns do not.
     /// </summary>
     public MonsterRarity Rarity { get; set; } = MonsterRarity.Unique;
+}
+
+/// <summary>
+/// Which opened chest retires a target. Every populated clause must hold, so an empty condition
+/// means "any chest anywhere in the area", and adding clauses narrows it.
+/// </summary>
+public record OpenCondition
+{
+    /// <summary>Chest metadata path patterns ("*" and "?" wildcards). Null matches any path.</summary>
+    public string[] Paths { get; set; }
+
+    /// <summary>
+    /// Area-graph room name patterns the chest has to sit inside. With a room clause only the
+    /// locations inside the room holding the chest retire, so a map with two of the same encounter
+    /// loses the line to the one that was looted and keeps the other. Null retires the whole
+    /// target, the way <see cref="DeathCondition"/> does.
+    /// </summary>
+    public string[] Rooms { get; set; }
 }
 
 public record TargetDescriptionAlternative

@@ -81,7 +81,6 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             _heightData = GameController.IngameState.Data.RawTerrainHeightData;
             _allTargetLocations = GetTargets();
             _rooms = GetRooms();
-            BuildClearConditions();
             _locationsByPosition = new ConcurrentDictionary<Vector2i, List<string>>(_allTargetLocations
                 .SelectMany(x => x.Value.Select(y => (x.Key, y)))
                 .ToLookup(x => x.y, x => x.Key)
@@ -98,6 +97,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
             GenerateMapTexture();
             _clusteredTargetLocations = ClusterTargets();
+            // After clustering: a clear condition is only worth building for a target that placed a
+            // waypoint in this area.
+            BuildClearConditions();
             StartPathFinding();
         }
     }

@@ -49,6 +49,39 @@
       "Name": "Metadata/Terrain/Woods/Woods/AzmeriLeague/hedgemaze/thickwall_cv_thinwall_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Exit Maze"
+    },
+    {
+      "Name": "Metadata/Terrain/Leagues/Deepwater/TerrainFeatures/DeepwaterEncounter_CursedTreasure*",
+      "Rooms": [ "*DeepwaterEncounter_CursedTreasure*" ],
+      "ExpectedCount": 3,
+      "DisplayName": "GhostChart",
+      "Color": "00FFFFFF",
+      "HideWhenOpened": {
+        "Paths": [ "Metadata/Chests/LeagueDeepwater/CursedTreasureChestEncounter" ],
+        "Rooms": [ "*DeepwaterEncounter_CursedTreasure*" ]
+      }
+    },
+    {
+      "Name": "Metadata/Terrain/Leagues/Deepwater/TerrainFeatures/DeepwaterEncounter_GiantCoral*",
+      "Rooms": [ "*DeepwaterEncounter_GiantCoral*" ],
+      "ExpectedCount": 3,
+      "DisplayName": "InstantChart",
+      "Color": "00FFFFFF",
+      "HideWhenOpened": {
+        "Paths": [ "Metadata/Chests/LeagueDeepwater/GiantCoralChest" ],
+        "Rooms": [ "*DeepwaterEncounter_GiantCoral*" ]
+      }
+    },
+    {
+      "Name": "Metadata/Terrain/Leagues/Deepwater/TerrainFeatures/DeepwaterEncounter_Brinerot*",
+      "Rooms": [ "*DeepwaterEncounter_Brinerot*" ],
+      "ExpectedCount": 3,
+      "DisplayName": "BrinerotChart",
+      "Color": "00FFFFFF",
+      "HideWhenOpened": {
+        "Paths": [ "Metadata/Chests/LeagueDeepwater/BrinerotStoresChestEncounter" ],
+        "Rooms": [ "*DeepwaterEncounter_Brinerot*" ]
+      }
     }
   ],
   "2_6_2": [
@@ -2233,6 +2266,7 @@
       "Name": "Metadata/Terrain/Forest/Transitions/church_dungeon_entrance_v01_01.tdt",
       "ExpectedCount": 1,
       "DisplayName": "Arena",
+      "Color": "FF0000FF",
       "Alternatives": [
         {
           "Name": "entrance",
