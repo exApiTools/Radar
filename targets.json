@@ -1,4 +1,4 @@
-{
+﻿{
   "*": [
     {
       "Name": "waypoint",
@@ -2226,6 +2226,22 @@
       "Name": "boss_arena",
       "ExpectedCount": 1,
       "DisplayName": "Arena"
+    }
+  ],
+  "MapWorldsCemetery": [
+    {
+      "Name": "Metadata/Terrain/Forest/Transitions/church_dungeon_entrance_v01_01.tdt",
+      "ExpectedCount": 1,
+      "DisplayName": "Arena",
+      "Alternatives": [
+        {
+          "Name": "entrance",
+          "ExpectedCount": 1
+        }
+      ],
+      "HideWhenDead": {
+        "Rooms": [ "*MapCemetary/Rooms/despair_boss.arm" ]
+      }
     }
   ],
   "*_Labyrinth_*": [
