@@ -6,6 +6,12 @@
       "DisplayName": "Waypoint"
     },
     {
+      "Name": "Metadata/Chests/LeagueAbyss/*",
+      "ExpectedCount": 25,
+      "DisplayName": "Abyss Chest",
+      "TargetType": "Entity"
+    },
+    {
       "Name": "npc1",
       "ExpectedCount": 1,
       "DisplayName": "Breaker of Oaths - Warlock [Wild/Purple]"

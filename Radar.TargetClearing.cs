@@ -31,8 +31,16 @@ public partial class Radar
 
     private sealed record ChestCondition(string EqualityId, Regex[] Paths, Room[] Rooms);
 
+    /// <summary>
+    /// An entity target places one waypoint per entity, so opening one of its chests retires that
+    /// one waypoint rather than the target. No room clause: the chests an abyss leaves behind sit
+    /// wherever the crack happened to stop, not inside a named room.
+    /// </summary>
+    private sealed record EntityChestCondition(string EqualityId, Regex Path);
+
     private List<ClearCondition> _clearConditions = [];
     private List<ChestCondition> _chestConditions = [];
+    private List<EntityChestCondition> _entityChestConditions = [];
 
     // Written from Tick, read from the pathfinding tasks' completion callbacks.
     private readonly ConcurrentDictionary<string, bool> _clearedTargets = new();
@@ -40,6 +48,10 @@ public partial class Radar
     // Retired one location at a time, keyed by "<EqualityId>|<x>,<y>". A chest condition with a room
     // clause hides the encounter that was looted without touching an identical one across the map.
     private readonly ConcurrentDictionary<string, bool> _clearedLocations = new();
+
+    // An opened chest stays in the entity list for as long as it is loaded, so without a per-chest
+    // latch the same chest would eat one more of its target's waypoints on every single tick.
+    private readonly ConcurrentDictionary<string, bool> _retiredChests = new();
 
     public override Job Tick()
     {
@@ -49,14 +61,23 @@ public partial class Radar
     }
 
     /// <summary>
+    /// Drops every latch from the previous area. Called before the new area's targets are
+    /// clustered, because clustering itself now reads these -- see
+    /// <see cref="ClusterTarget(TargetDescription)"/>.
+    /// </summary>
+    private void ResetTargetClearing()
+    {
+        _clearedTargets.Clear();
+        _clearedLocations.Clear();
+        _retiredChests.Clear();
+    }
+
+    /// <summary>
     /// Resolves each area target's <see cref="DeathCondition"/> against this instance once, so the
     /// per-tick check is a bounds test rather than a regex sweep over every room name.
     /// </summary>
     private void BuildClearConditions()
     {
-        _clearedTargets.Clear();
-        _clearedLocations.Clear();
-
         // Only a target that actually placed a waypoint here can be retired, and a description in
         // the "*" group belongs to every area -- filtering on that first keeps the room diagnostics
         // below about the maps where the target really lives.
@@ -87,6 +108,15 @@ public partial class Radar
                     (condition.Paths ?? []).Select(p => p.ToLikeRegex()).ToArray(),
                     ResolveRooms(condition.Rooms, x, nameof(TargetDescription.HideWhenOpened)));
             })
+            .ToList();
+
+        // Deliberately built from every entity target in the area, not from presentTargets: an entity
+        // target has no waypoint yet at area load -- EntityAdded places them later, and an abyss has
+        // not cracked open a single chest at that point -- so filtering on presence here would build
+        // a condition for exactly the targets that can never need one.
+        _entityChestConditions = _targetDescriptionsInArea.Values
+            .Where(x => x.TargetType == TargetType.Entity)
+            .Select(x => new EntityChestCondition(x.EqualityId, x.Name.ToLikeRegex()))
             .ToList();
 
         foreach (var condition in _clearConditions)
@@ -176,7 +206,7 @@ public partial class Radar
     /// </summary>
     private void UpdateOpenedTargets()
     {
-        if (_chestConditions.Count == 0) return;
+        if (_chestConditions.Count == 0 && _entityChestConditions.Count == 0) return;
 
         var chests = GameController.EntityListWrapper.ValidEntitiesByType[EntityType.Chest];
         if (chests == null) return;
@@ -192,7 +222,41 @@ public partial class Radar
 
                 HideTargetLocations(condition.EqualityId, room);
             }
+
+            foreach (var condition in _entityChestConditions)
+            {
+                if (chest.Path is not { } path || !condition.Path.IsMatch(path)) continue;
+
+                // Latched only once the waypoint is actually gone. A chest that loads already opened
+                // can be seen here before EntityAdded has clustered it, and latching on sight would
+                // leave that waypoint on the map for the rest of the run.
+                var key = $"{condition.EqualityId}|{chest.Id}";
+                if (_retiredChests.ContainsKey(key)) continue;
+                if (RetireNearestLocation(condition.EqualityId, chest.GridPosNum))
+                {
+                    _retiredChests[key] = true;
+                }
+            }
         }
+    }
+
+    /// <summary>
+    /// Retires the single waypoint this chest put on the map. An entity target's waypoint is the
+    /// entity's own position nudged onto walkable ground, so the chest's waypoint is the nearest
+    /// location of that target -- and looting one abyss chest says nothing about the other two.
+    /// </summary>
+    private bool RetireNearestLocation(string equalityId, Vector2 chestPosition)
+    {
+        if (!_clusteredTargetLocations.TryGetValue(equalityId, out var existing)) return false;
+
+        var doomed = existing.Locations
+            .OrderBy(l => Vector2.DistanceSquared(l, chestPosition))
+            .Take(1)
+            .ToArray();
+        if (doomed.Length == 0) return false;
+
+        RetireLocations(equalityId, existing, doomed);
+        return true;
     }
 
     private static bool Matches(ChestCondition condition, Entity chest, out Room room)
@@ -243,6 +307,16 @@ public partial class Radar
             if (doomed.Length == 0) return;
         }
 
+        RetireLocations(equalityId, existing, doomed);
+    }
+
+    /// <summary>
+    /// Drops <paramref name="doomed"/> from a target, leaving its other waypoints alone. The
+    /// latch in <see cref="_clearedLocations"/> is what keeps an in-flight pathfinding task from
+    /// putting the route back after the waypoint it belongs to is gone.
+    /// </summary>
+    private void RetireLocations(string equalityId, TargetLocations existing, Vector2[] doomed)
+    {
         foreach (var location in doomed)
         {
             _clearedLocations[LocationKey(equalityId, location)] = true;

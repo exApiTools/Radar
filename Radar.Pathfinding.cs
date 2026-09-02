@@ -58,12 +58,12 @@ public partial class Radar
                          .SelectMany(x => x.Value.Locations.Select(loc=>(loc, x.Value.Target)))
                          .GroupBy(x => x.loc, x=>x.Target))
             {
-                AddRoute(group.Key, group.ToList(), null);
+                AddRoute(group.Key, group.ToList());
             }
         }
     }
 
-    private void AddRoute(Vector2 target, List<TargetDescription> targetDescriptions, Entity entity)
+    private void AddRoute(Vector2 target, List<TargetDescription> targetDescriptions)
     {
         var color = _getColor();
 
@@ -77,25 +77,12 @@ public partial class Radar
 
         var routes = _routes;
 
+        // Retiring an entity target is not this method's job. Watching the entity from here meant
+        // the route also went the moment the entity left the cull square, which retires a chest the
+        // player never opened and never restarts, because EntityAdded sees the position it already
+        // knows and adds nothing. UpdateOpenedTargets sweeps the chest list every tick instead, so
+        // it survives the entity unloading and reloading.
         var cancellationToken = _findPathsCts.Token;
-        if (targetDescriptions.Any(x => x.TargetType == TargetType.Entity) && entity != null)
-        {
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cancellationToken = cts.Token;
-
-            async Task CheckEntity()
-            {
-                while (entity.IsValid && entity.GetComponent<Chest>()?.IsOpened != true)
-                {
-                    await Task.Delay(100, cancellationToken);
-                }
-
-                await cts.CancelAsync();
-                routes.Remove(target, out _);
-            }
-
-            _ = CheckEntity();
-        }
 
         AddRoute(target, path =>
         {
@@ -265,6 +252,12 @@ public partial class Radar
             .Select(tAlt => ClusterTarget(tAlt.Name, tAlt.Rooms, tAlt.ExpectedCount))
             .FirstOrDefault(x => x != null);
         if (locations == null) return null;
+        // An entity target re-clusters every time one of its entities spawns, and the raw location
+        // list it clusters from still holds the chest that was already looted -- nothing takes a
+        // position back out of _allTargetLocations. Without this, the next abyss chest to appear
+        // would put the retired waypoint back on the map.
+        locations = locations.Where(l => !IsRetired(target.EqualityId, l)).ToArray();
+        if (locations.Length == 0) return null;
         return new TargetLocations
         {
             Locations = locations,
