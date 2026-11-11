@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ExileCore;
 using ExileCore.Shared.Helpers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -19,6 +20,11 @@ public partial class Radar
         var gridHeightData = _heightData;
         var maxX = _areaDimensions.Value.X;
         var maxY = _areaDimensions.Value.Y;
+        if (_processedTerrainData.Length < maxY)
+        {
+            DebugWindow.LogError($"Got processed terrain size {_processedTerrainData.Length}, area dimension is {maxY}");
+        }
+
         var configuration = Configuration.Default.Clone();
         configuration.PreferContiguousImageBuffers = true;
         using var image = new Image<Rgba32>(configuration, maxX, maxY);

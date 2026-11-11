@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.MemoryObjects;
+using ExileCore.Shared;
 using ExileCore.Shared.Helpers;
 using GameOffsets;
 using GameOffsets.Native;
@@ -165,16 +166,17 @@ public partial class Radar
         while (true)
         {
             await WaitUntilPluginEnabled(cancellationToken);
-            var newPosition = GetPlayerPosition();
-            if (playerPosition == newPosition)
-            {
-                await Task.Delay(100, cancellationToken);
-                continue;
-            }
 
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
+            }
+
+            var newPosition = GetPlayerPosition();
+            if (playerPosition == newPosition)
+            {
+                await TaskUtils.NextFrame();
+                continue;
             }
 
             playerPosition = newPosition;

@@ -179,14 +179,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
     private Vector2 GetPlayerMapGrid()
     {
-        var pos = GameController.Game.IngameState.Data.LocalPlayer.PosNum;
-        return new Vector2(pos.X * PoeMapExtension.WorldToGridConversion, pos.Y * PoeMapExtension.WorldToGridConversion);
-    }
-
-    private Vector2 GetPlayerTerrainGrid()
-    {
-        var pos = GameController.Game.IngameState.Data.LocalPlayer?.GetComponent<Positioned>();
-        return pos == null ? GetPlayerMapGrid() : new Vector2(pos.GridX, pos.GridY);
+        return GameController.Game.IngameState.Data.LocalPlayerPos.Xy() * PoeMapExtension.WorldToGridConversion;
     }
 
     private Vector2 GetPlayerPosition() => GetPlayerMapGrid();
@@ -194,7 +187,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private SubMap GetVisibleSubMap()
     {
         var map = GameController.Game.IngameState.IngameUi.Map;
-        return map.VisibleSubMap == VisibleSubMap.Small ? map.SmallMiniMap : map.LargeMap.AsObject<SubMap>();
+        return map.VisibleSubMap == VisibleSubMap.Small ? map.SmallMiniMap : map.LargeMap;
     }
 
     public override void Render()
@@ -483,8 +476,7 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
     private Vector2 MapGridToScreen(Vector2 gridCell, bool perCellTerrain = true)
     {
         var playerGridPosition = GetPlayerMapGrid();
-        var playerTerrain = GetPlayerTerrainGrid();
-        var playerScreenPosition = Graphics.GridToMap(playerGridPosition, playerTerrain, VisibleSubMap.Any);
+        var playerScreenPosition = Graphics.GridToMap(playerGridPosition, playerGridPosition, VisibleSubMap.Any);
         var screenOffset = new Vector2(Settings.Debug.MapCenterOffsetX.Value, Settings.Debug.MapCenterOffsetY.Value);
         var playerRender = GameController.Game.IngameState.Data.LocalPlayer?.GetComponent<Render>();
         if (playerRender == null)
