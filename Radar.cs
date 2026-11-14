@@ -97,6 +97,9 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
 
             GenerateMapTexture();
             _clusteredTargetLocations = ClusterTargets();
+            // After clustering: a clear condition is only worth building for a target that placed a
+            // waypoint in this area.
+            BuildClearConditions();
             StartPathFinding();
         }
     }

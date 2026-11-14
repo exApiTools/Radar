@@ -100,7 +100,8 @@ public partial class Radar
 
         AddRoute(target, path =>
         {
-            if (path != null)
+            // Pathfinding is asynchronous, so a route can land after its target was retired.
+            if (path != null && !targetDescriptions.All(x => IsRetired(x.EqualityId, target)))
             {
                 Func<Color> customColorFunc = null;
                 if (targetDescriptions.FirstOrDefault(x => x.Color != null)?.Color is { } colorText)
