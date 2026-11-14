@@ -96,7 +96,14 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
             }
 
             GenerateMapTexture();
+            // Before clustering, not after: ClusterTarget filters retired locations out, so leaving
+            // the previous area's latches in place would suppress the same waypoint in a re-entered
+            // instance, where the target clusters to the very same coordinates.
+            ResetTargetClearing();
             _clusteredTargetLocations = ClusterTargets();
+            // After clustering: a clear condition is only worth building for a target that placed a
+            // waypoint in this area.
+            BuildClearConditions();
             StartPathFinding();
         }
     }
@@ -165,12 +172,18 @@ public partial class Radar : BaseSettingsPlugin<RadarSettings>
                 if (!alreadyContains)
                 {
                     var oldValue = _clusteredTargetLocations.GetValueOrDefault(targetDescription.EqualityId);
-                    var newValue = _clusteredTargetLocations.AddOrUpdate(targetDescription.EqualityId,
-                        _ => ClusterTarget(_targetDescriptionsInArea[targetDescription.EqualityId]),
-                        (_, _) => ClusterTarget(_targetDescriptionsInArea[targetDescription.EqualityId]));
+                    var newValue = ClusterTarget(_targetDescriptionsInArea[targetDescription.EqualityId]);
+                    if (newValue == null)
+                    {
+                        // Every location this target had has been retired.
+                        _clusteredTargetLocations.TryRemove(targetDescription.EqualityId, out _);
+                        return;
+                    }
+
+                    _clusteredTargetLocations[targetDescription.EqualityId] = newValue;
                     foreach (var newLocation in newValue.Locations.Except(oldValue?.Locations ?? []))
                     {
-                        AddRoute(newLocation, [targetDescription], entity);
+                        AddRoute(newLocation, [targetDescription]);
                     }
                 }
             }
