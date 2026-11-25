@@ -2328,5 +2328,14 @@
       "DisplayName": "Starfall Crater",
       "TargetType": "Entity"
     }
+  ],
+  "MapWorldsCarcass": [
+    {
+      "Rooms": [
+        "Metadata/Terrain/EndGame/MapCarcass/Rooms/IntroRooms/Unique/core_entrance_*.arm"
+      ],
+      "ExpectedCount": 1,
+      "DisplayName": "Core Entrance"
+    }
   ]
 }
